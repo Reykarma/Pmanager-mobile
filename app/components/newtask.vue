@@ -1,41 +1,46 @@
 <template>
 
 	<page class="principal">
-  <DockLayout class="Agregar">
-    <StackLayout dock="top" class="formulario">
-      <Label class="Title" v-model="status" :text="'Nueva tarjeta en '+status" fontWeight="bold" />
+		<DockLayout class="Agregar">
+			<StackLayout dock="top" class="formulario">
+				<Label class="Title" :text="'Nueva tarjeta en '+status" fontWeight="bold" />
       <TextField v-model="Titulo" class="inputs" hint="Agregar Texto" />
     </StackLayout>
     <StackLayout orientation="horizontal" class="Buttons" dock="bottom">
 	     <Button fontWeight="bold"  color="crimson" text="Cancelar" @tap="$modal.close()" />
-       <Button fontWeight="bold" color="black" @tap="Agregar()" text="Aceptar"/>
+       <Button fontWeight="bold" color="black" @tap="Agregar" text="Aceptar"/>
     </StackLayout>
 	</DockLayout>
 </page>
 </template>
 <script>
 export default {
-    props:['status'],
+
+    props: ["status","id"],
     data() {
         return {
-					id:2,
-					status:"",
-					Titulo:"",
-					progress:"",
-					comment:"",
-					play:"",
+            Titulo: "",
+            progress: "",
+            comment: "",
+            button:false,
         };
     },
-    methods:{
-			Agregar(){
-				this.$modal.close({id:this.id,status:this.status,Titulo:this.Titulo,progress:this.progress,coment:this.comment,play:this.play});
-			}
-		},
+    methods: {
+        Agregar() {
+            this.$modal.close({
+              id:this.id,
+              status: this.status,
+              Titulo: this.Titulo,
+              progress: this.progress,
+              coment: this.comment,
+              button: this.button
+            });
+        },
+    }
 };
 </script>
 
 <style scoped>
-
 .Agregar{
   width: 100%;
   height:800px;
@@ -61,7 +66,6 @@ export default {
   font-size: 18px;
   border-radius:20px;
 }
-
 .inputs{
   border-width: 0 0 2 0;
   border-bottom-color: #33af14 ;
