@@ -15,27 +15,26 @@
 </template>
 <script>
 export default {
-
-    props: ["status","id"],
+    props: ["status", "id"],
     data() {
         return {
             Titulo: "",
             progress: "",
             comment: "",
-            button:false,
+            button: false
         };
     },
     methods: {
         Agregar() {
             this.$modal.close({
-              id:this.id,
-              status: this.status,
-              Titulo: this.Titulo,
-              progress: this.progress,
-              coment: this.comment,
-              button: this.button
+                id: this.id,
+                status: this.status,
+                Titulo: this.Titulo,
+                progress: this.progress,
+                coment: this.comment,
+                button: this.button
             });
-        },
+        }
     }
 };
 </script>

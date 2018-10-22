@@ -1,14 +1,17 @@
 <template>
 	<Page class="page" statusBarstyle="light" androidStatusBarBackground="#3b63a4" backgroundSpanUnderStatusBar="true">
-		<ActionBar title="P-manager" class="action-bar" backgroundColor="#4D7BC6" color="white" />
+		<ActionBar title="P-manager" class="action-bar" backgroundColor="#4D7BC6" color="white">
+			
+		</ActionBar>
+
 		<ScrollView orientation="horizontal">
 			<FlexboxLayout class="container">
 
 				<StackLayout v-for="status in status" orientation="vertical" class="container-list">
 					<AbsoluteLayout class="Title-list">
 						<label textWrap="true" :text="status" fontWeight="bold"/>
-                         <button class="add-card" text="+" fontWeight="bold" @tap="Nuevo(status)"/>
-                    </AbsoluteLayout>
+            <button class="add-card" text="+" fontWeight="bold" @tap="Nuevo(status)"/>
+          </AbsoluteLayout>
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
@@ -59,7 +62,8 @@ export default {
         Delete(id) {
             for (var a in this.tasks) {
                 if (this.tasks[a].id ===id) {
-                    this.tasks.splice(this.tasks[a], 1);
+                    this.tasks.splice(a, 1);
+
                 }
             }
         },
@@ -150,5 +154,4 @@ export default {
     font-size:22px;
     border-radius:20px;
 }
-
 </style>
