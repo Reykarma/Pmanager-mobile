@@ -1,27 +1,50 @@
 <template>
 	<Page class="page" statusBarstyle="light" androidStatusBarBackground="#3b63a4" backgroundSpanUnderStatusBar="true">
-		<ActionBar title="P-manager" class="action-bar" backgroundColor="#4D7BC6" color="white">
-			
+		<ActionBar class="action-bar" backgroundColor="#4D7BC6" color="white">
+			<WrapLayout orientation="horizontal">
+				<AbsoluteLayout class="return">
+					<Image class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
+				</AbsoluteLayout>
+					<label verticalAlignment="center" class="title-page" textWrap="true" text="P-Manager" fontWeight="bold"/>
+					<AbsoluteLayout class="top-menu">
+						<Image class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
+					</AbsoluteLayout>
+			</WrapLayout>
 		</ActionBar>
 
 		<ScrollView orientation="horizontal">
 			<FlexboxLayout class="container">
-
 				<StackLayout v-for="status in status" orientation="vertical" class="container-list">
 					<AbsoluteLayout class="Title-list">
-						<label textWrap="true" :text="status" fontWeight="bold"/>
-            <button class="add-card" text="+" fontWeight="bold" @tap="Nuevo(status)"/>
+						<label verticalAlignment="center" textWrap="true" :text="status" fontWeight="bold"/>
+						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(status)">
+							<Image class="button_add" src="res://icon_add" stretch="aspectFill" verticalAlignment="center" />
+						</AbsoluteLayout>
           </AbsoluteLayout>
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
-                <WrapLayout @longPress="showbutton(list.id, list.button)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
-				    <label class="title-cards" textWrap="true" :text="list.title"/>
-                <AbsoluteLayout  class="content_components">
-					<Label @longPress="showbutton(list.id,list.button)" @tap="Delete(list.id)" fontWeight="bold" textWrap="true" color="white" text="Eliminar" v-show="list.button" class="Delete_button" />
-                </AbsoluteLayout>
+
+                <WrapLayout @longPress="showbutton(list.id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
+				    			<label class="title-cards" textWrap="true" :text="list.title"/>
                   <label class="progress-task" textWrap="true" :text="list.progress"/>
+									<StackLayout orientation="horizontal" class="content_components">
+
+										<AbsoluteLayout horizontalAligment="left"  v-show="list.button" class="left_button">
+											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" />
+										</AbsoluteLayout>
+
+										<AbsoluteLayout horizontalAligment="center"  @tap="Delete(list.id)" v-show="list.button" class="Delete_button">
+											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
+										</AbsoluteLayout>
+
+										<AbsoluteLayout horizontalAligment="left"  v-show="list.button" class="right_button">
+											<Image src="res://icon_right" stretch="aspectFill" verticalAlignment="center" />
+										</AbsoluteLayout>
+
+	                </StackLayout>
                 </WrapLayout>
+
               </StackLayout>
             </ScrollView>
           </StackLayout>
@@ -34,7 +57,6 @@ import ModalComponent from "./newtask";
 export default {
     data() {
         return {
-            mensaje: "afios",
             status: ["Backlog", "Progress", "Review", "Stop"],
             tasks: [],
             id:0,
@@ -67,7 +89,7 @@ export default {
                 }
             }
         },
-        showbutton(id, button) {
+        showbutton(id) {
             for (var a in this.tasks){
                 if(this.tasks[a].id===id){
                     if(this.tasks[a].button==false){
@@ -83,6 +105,24 @@ export default {
 </script>
 
 <style scoped>
+.return{
+	width: 15%;
+}
+.button-return{
+	width: 70%;
+	height: 100%;
+}
+.title-page{
+	font-size: 20%;
+	width:30%;
+}
+.top-menu{
+	width:40%;
+}
+.button-calendar{
+	width: 25%;
+	margin-left: 75%;
+}
 .container {
     width: 350%;
     height: 100%;
@@ -110,13 +150,14 @@ export default {
   padding-left: 10%;
 }
 .add-card{
-  width: 180px;
-  height:180px;
- border-radius: 100%;
- margin-left: 80%;
- margin-top: 5%;
+  height:90%;
+	margin-top: 5%;
+  margin-left: 80%;
  color: white;
- background-color: crimson;
+}
+.button_add{
+	width: 100%;
+	height: 100%;
 }
 .list{
   width: 90%;
@@ -146,12 +187,24 @@ export default {
   width: 90%;
   color: #ee084d;
 }
-.Delete_button{
-    width:100%;
-    height:35%;
+.Delete_button, .left_button, .right_button{
+    width:12%;
     padding:10px 0 10px 0;
-    background-Color:crimson;
     font-size:22px;
     border-radius:20px;
+		background-color: crimson;
+}
+.Delete_button{
+	margin-right: 30%;
+	margin-left: 30%;
+}
+.Delete_button image, .left_button image, .right_button image{
+    width: 100%;
+}
+.left_button, .right_button{
+		background-color: #2979ff;
+}
+.left_button{
+	margin-left: 2%;
 }
 </style>
