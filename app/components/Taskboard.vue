@@ -28,21 +28,21 @@
                 <WrapLayout @longPress="showbutton(list.id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
 				    			<label class="title-cards" textWrap="true" :text="list.title"/>
                   <label class="progress-task" textWrap="true" :text="list.progress"/>
-									<StackLayout orientation="horizontal" class="content_components">
 
-										<AbsoluteLayout horizontalAligment="left"  v-show="list.button" class="left_button">
-											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" />
+									<WrapLayout class="content_components">
+										<AbsoluteLayout v-show="list.button" class="left_button">
+											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change_left(list.status,list.id)"/>
 										</AbsoluteLayout>
 
-										<AbsoluteLayout horizontalAligment="center"  @tap="Delete(list.id)" v-show="list.button" class="Delete_button">
+										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete(list.id)" v-show="list.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
 
-										<AbsoluteLayout horizontalAligment="left"  v-show="list.button" class="right_button">
-											<Image src="res://icon_right" stretch="aspectFill" verticalAlignment="center" />
+										<AbsoluteLayout v-show="list.button" class="right_button">
+											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change_right(list.status,list.id)" />
 										</AbsoluteLayout>
+	                </WrapLayout>
 
-	                </StackLayout>
                 </WrapLayout>
 
               </StackLayout>
@@ -85,7 +85,7 @@ export default {
             for (var a in this.tasks) {
                 if (this.tasks[a].id ===id) {
                     this.tasks.splice(a, 1);
-
+										break;
                 }
             }
         },
@@ -94,12 +94,34 @@ export default {
                 if(this.tasks[a].id===id){
                     if(this.tasks[a].button==false){
                         this.tasks[a].button=true;
+												break;
                     }else{
                         this.tasks[a].button=false;
+												break;
                     }
                 }
             }
-        }
+        },
+				change_right(status,id){
+					var index = this.status.indexOf(status)
+					for(var a in this.tasks){
+						if (this.tasks[a].id === id) {
+								this.tasks[a].status=this.status[index+1];
+								this.tasks[a].button=false;
+								break;
+						}
+					}
+				},
+				change_left(status,id){
+					var index = this.status.indexOf(status)
+					for(var a in this.tasks){
+						if (this.tasks[a].id === id) {
+								this.tasks[a].status=this.status[index-1]
+								this.tasks[a].button=false;
+								break;
+						}
+					}
+				}
     }
 };
 </script>
@@ -202,9 +224,10 @@ export default {
     width: 100%;
 }
 .left_button, .right_button{
-		background-color: #2979ff;
+		background-color: white;
 }
 .left_button{
 	margin-left: 2%;
 }
+
 </style>
