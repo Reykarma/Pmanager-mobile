@@ -1,10 +1,9 @@
 <template>
-
 	<page class="principal">
 		<DockLayout class="Agregar">
 			<StackLayout dock="top" class="formulario">
-				<Label class="Title" :text="'Nueva tarjeta en '+status" fontWeight="bold" />
-      <TextField v-model="Titulo" class="inputs" hint="Agregar Texto" />
+				<Label class="Title" :text="'Nueva tarjeta en '+ status" fontWeight="bold" />
+      <TextField @returnPress="Agregar" v-model="Titulo" class="inputs" hint="Agregar Texto" />
     </StackLayout>
     <StackLayout orientation="horizontal" class="Buttons" dock="bottom">
 	     <Button fontWeight="bold"  color="crimson" text="Cancelar" @tap="$modal.close()" />
@@ -42,7 +41,7 @@ export default {
 <style scoped>
 .Agregar{
   width: 100%;
-  height:800px;
+  height:40%;
 }
 .formulario{
   width: 100%;

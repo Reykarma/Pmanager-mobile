@@ -24,8 +24,7 @@
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
-
-                <WrapLayout @longPress="showbutton(list.id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
+                <WrapLayout @tap="checklist(list.title)"  @longPress="showbutton(list.id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
 				    			<label class="title-cards" textWrap="true" :text="list.title"/>
                   <label class="progress-task" textWrap="true" :text="list.progress"/>
 
@@ -54,6 +53,7 @@
 </template>
 <script>
 import ModalComponent from "./newtask";
+import checklist from "./checklist";
 export default {
     data() {
         return {
@@ -64,7 +64,6 @@ export default {
     },
     methods: {
         Nuevo(status) {
-            var status = status;
 						this.id=this.id+1
             this.$showModal(ModalComponent, { props: { status: status, id:this.id} }).then(
                 data => {
@@ -121,6 +120,9 @@ export default {
 								break;
 						}
 					}
+				},
+				checklist(title){
+					this.$navigateTo(checklist,{ props: { title: title} });
 				}
     }
 };
