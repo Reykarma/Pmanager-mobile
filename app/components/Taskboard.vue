@@ -7,7 +7,7 @@
 				</AbsoluteLayout>
 					<label verticalAlignment="center" class="title-page" textWrap="true" text="P-Manager" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
-						<Image class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
+						<Image @tap="prueba()" class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
 					</AbsoluteLayout>
 			</WrapLayout>
 		</ActionBar>
@@ -24,21 +24,21 @@
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
-                <WrapLayout @tap="checklist(list.title)"  @longPress="showbutton(list.id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
-				    			<label class="title-cards" textWrap="true" :text="list.title"/>
-                  <label class="progress-task" textWrap="true" :text="list.progress"/>
+                <WrapLayout @tap="checklist(list.work,list._id)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
+				    			<label class="title-cards" textWrap="true" :text="list.work"/>
+                  <label class="progress-task" textWrap="true" :text="adios"/>
 
 									<WrapLayout class="content_components">
 										<AbsoluteLayout v-show="list.button" class="left_button">
-											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change_left(list.status,list.id)"/>
+											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change(list.status,list._id, sai='m')"/>
 										</AbsoluteLayout>
 
-										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete(list.id)" v-show="list.button" class="Delete_button">
+										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete(list._id)" v-show="list.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
 
 										<AbsoluteLayout v-show="list.button" class="right_button">
-											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change_right(list.status,list.id)" />
+											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change(list.status,list._id, sai='n' )" />
 										</AbsoluteLayout>
 	                </WrapLayout>
 
@@ -54,12 +54,34 @@
 <script>
 import ModalComponent from "./newtask";
 import checklist from "./checklist";
+var SocketIO = require('nativescript-socketio').SocketIO;
+var direccion_socket="http://172.21.2.42:5000/view"
+var direccion_data="http://172.21.2.42:5000/api/momantai/plam/task"
+var querystring = require ("querystring")
+var socketIO = new SocketIO(direccion_socket);
+socketIO.connect();
+const httpModule = require("http");
+
 export default {
+
+	created(){
+		httpModule.request({
+				url: direccion_data,
+				method:'GET'
+			}).then((response)=>{
+				var r = response.content.toJSON();
+				for (var a in r.task){
+				r.task[a].button = false;
+			}
+				this.tasks = r.task;
+			});
+	},
     data() {
         return {
             status: ["Backlog", "Progress", "Review", "Stop"],
             tasks: [],
             id:0,
+						adios:""
         };
     },
     methods: {
@@ -68,29 +90,37 @@ export default {
             this.$showModal(ModalComponent, { props: { status: status, id:this.id} }).then(
                 data => {
                     if (data.Titulo != "") {
-                        this.tasks.push({
-                            id: data.id,
-                            status: data.status,
-                            title: data.Titulo,
-                            progress: data.progress,
-                            coment: data.comment,
-                            button: data.button
-                        });
+												httpModule.request({
+														url: direccion_data,
+														method: 'POST',
+														content: querystring.stringify({
+														'work': data.Titulo,
+														'status': data.status,
+														'm': data.m,
+														'typeAction': data.typeAction,
+														'tags':"",
+														})
+													});
                     }
                 }
             );
         },
         Delete(id) {
-            for (var a in this.tasks) {
-                if (this.tasks[a].id ===id) {
-                    this.tasks.splice(a, 1);
-										break;
-                }
-            }
+					httpModule.request({
+							url: direccion_data,
+							method: 'PUT',
+							content: querystring.stringify({
+								'_id': id,
+								'm': 'rm',
+								'typeAction':'deleteTask',
+								'action':'delete'
+							})
+						});
+
         },
         showbutton(id) {
             for (var a in this.tasks){
-                if(this.tasks[a].id===id){
+                if(this.tasks[a]._id==id){
                     if(this.tasks[a].button==false){
                         this.tasks[a].button=true;
 												break;
@@ -101,31 +131,38 @@ export default {
                 }
             }
         },
-				change_right(status,id){
-					var index = this.status.indexOf(status)
-					for(var a in this.tasks){
-						if (this.tasks[a].id === id) {
-								this.tasks[a].status=this.status[index+1];
-								this.tasks[a].button=false;
-								break;
-						}
-					}
-				},
-				change_left(status,id){
-					var index = this.status.indexOf(status)
-					for(var a in this.tasks){
-						if (this.tasks[a].id === id) {
-								this.tasks[a].status=this.status[index-1]
-								this.tasks[a].button=false;
-								break;
-						}
-					}
+				change(status,id,sai){
+					httpModule.request({
+							url: direccion_data,
+							method: 'PUT',
+							content: querystring.stringify({
+								'_id': id,
+								'status': status,
+								'm': 'rm',
+								'move':sai,
+								'typeAction':'changeStatus'
+							})
+						});
 				},
 				checklist(title){
-					this.$navigateTo(checklist,{ props: { title: title} });
-				}
+					this.$navigateTo(checklist,{ props: { title: title, direccion_data:direccion_data,direccion_socket:direccion_socket,socketIO:socketIO }});
+				},
+				prueba(){
+			//	socketIO.emit("message","te la comes");
+				httpModule.request({
+						url: direccion_data,
+						method: 'POST',
+						content: querystring.stringify({
+							'_id': '172eb287dbw871wbbwd78d',
+							'work': 'Prueba, ejemplo',
+							'status': 'backlog',
+							'm': 'rm',
+							'typeAction': 'create'
+						})
+					});
     }
-};
+	}
+}
 </script>
 
 <style scoped>

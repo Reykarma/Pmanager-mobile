@@ -8,28 +8,37 @@
             <label verticalAlignment="center" class="title-page" :text="title" fontWeight="bold"/>
         </WrapLayout>
       </ActionBar>
+
+          <ScrollView orientation="vertical">
             <StackLayout class="properties">
-              <ScrollView>
                 <StackLayout orientation="horizontal" class="work">
                   <AbsoluteLayout class="logo-list">
                     <Image src="res://icon_checklist" stretch="aspectFill"/>
                   </AbsoluteLayout>
-                  <label verticalAlignment="center" class="title-work" textWrap="true" text="Checklist" fontWeight="bold"/>
+                    <label verticalAlignment="center" class="title-work" textWrap="true" text="Checklist" fontWeight="bold"/>
                 </StackLayout>
 
-              </ScrollView>
+                <StackLayout orientation="horizontal" class="checklist">
+                  <label :text="direccion"/>
+                </StackLayout>
+
             </StackLayout>
+          </ScrollView>
     </Page>
 </template>
 
 <script>
 export default {
-  props: ["title"],
+  props: ["title", "direccion_data","direccion_socket","socketIO"],
+
     data () {
         return {
 
         };
     },
+      methods: {
+
+      },
 }
 </script>
 
@@ -60,6 +69,10 @@ export default {
 .title-work{
   margin-left: 4%;
   font-size: 20%;
+}
+.checklist{
+  width: 100%;
+  height: 200px;
 }
 
 </style>

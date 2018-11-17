@@ -18,20 +18,17 @@ export default {
     data() {
         return {
             Titulo: "",
-            progress: "8/5",
-            comment: "",
-            button: false
+						m: 'rm',
+						typeAction: 'create'
         };
     },
     methods: {
         Agregar() {
             this.$modal.close({
-                id: this.id,
                 status: this.status,
                 Titulo: this.Titulo,
-                progress: this.progress,
-                coment: this.comment,
-                button: this.button
+								m:this.m,
+								typeAction:this.typeAction,
             });
         }
     }
