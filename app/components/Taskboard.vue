@@ -26,7 +26,7 @@
               <StackLayout orientation="vertical" class="list">
                 <WrapLayout @tap="checklist(list.work,list._id)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
 				    			<label class="title-cards" textWrap="true" :text="list.work"/>
-                  <label class="progress-task" textWrap="true" :text="adios"/>
+                  <label class="progress-task" textWrap="true" text="8/10"/>
 
 									<WrapLayout class="content_components">
 										<AbsoluteLayout v-show="list.button" class="left_button">
@@ -51,17 +51,17 @@
         </ScrollView>
     </Page>
 </template>
+
 <script>
 import ModalComponent from "./newtask";
 import checklist from "./checklist";
 var SocketIO = require('nativescript-socketio').SocketIO;
-var direccion_socket="http://172.21.2.42:5000/view"
-var direccion_data="http://172.21.2.42:5000/api/momantai/plam/task"
+var direccion_socket="https://pmanagerd.mybluemix.net/view"
+var direccion_data="https://pmanagerd.mybluemix.net/api/momantai/plam/task"
 var querystring = require ("querystring")
 var socketIO = new SocketIO(direccion_socket);
 socketIO.connect();
 const httpModule = require("http");
-
 export default {
 
 	created(){
@@ -148,7 +148,7 @@ export default {
 					this.$navigateTo(checklist,{ props: { title: title, direccion_data:direccion_data,direccion_socket:direccion_socket,socketIO:socketIO }});
 				},
 				prueba(){
-			//	socketIO.emit("message","te la comes");
+			//	socketIO.emit("message","te la ");
 				httpModule.request({
 						url: direccion_data,
 						method: 'POST',
@@ -166,12 +166,17 @@ export default {
 </script>
 
 <style scoped>
+.action-bar{
+height: 55em;
+}
+
 .return{
 	width: 15%;
+	height: 100%;
 }
 .button-return{
-	width: 70%;
-	height: 100%;
+	height: 70%;
+	margin-top: 15%;
 }
 .title-page{
 	font-size: 20%;
@@ -179,9 +184,11 @@ export default {
 }
 .top-menu{
 	width:40%;
+	height: 100%;
 }
 .button-calendar{
-	width: 25%;
+	height: 70%;
+	margin-top: 15%;
 	margin-left: 75%;
 }
 .container {

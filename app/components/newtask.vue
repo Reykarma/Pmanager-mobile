@@ -3,7 +3,7 @@
 		<DockLayout class="Agregar">
 			<StackLayout dock="top" class="formulario">
 				<Label class="Title" :text="'Nueva tarjeta en '+ status" fontWeight="bold" />
-      <TextField @returnPress="Agregar" v-model="Titulo" class="inputs" hint="Agregar Texto" />
+      <TextField  @returnPress="Agregar" v-model="Titulo" class="inputs" hint="Agregar Texto" />
     </StackLayout>
     <StackLayout orientation="horizontal" class="Buttons" dock="bottom">
 	     <Button fontWeight="bold"  color="crimson" text="Cancelar" @tap="$modal.close()" />
