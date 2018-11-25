@@ -5,7 +5,10 @@
           <AbsoluteLayout class="return">
             <Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
           </AbsoluteLayout>
-            <label verticalAlignment="center" class="title-page" :text="title" fontWeight="bold"/>
+            <Textview @focus="edit_title_text()" @blur="edit_title_text()" verticalAlignment="center" class="title-page" :text="title" fontWeight="bold"/>
+            <AbsoluteLayout class="ready-title">
+              <Image @tap="change_title_button()" v-show="save_title" src="res://icon_ready" stretch="aspectFill"/>
+            </AbsoluteLayout>
         </WrapLayout>
       </ActionBar>
 
@@ -13,10 +16,10 @@
             <StackLayout orientation="vertical" class="properties">
               <StackLayout orientation="horizontal">
               <WrapLayout class="description">
-              <Textview v-model="description" class="description-text" @focus="edit_description()" @blur="edit_description()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
+              <Textview v-model="description" class="description-text" @focus="edit_description_text()" @blur="edit_description_text()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
               </WrapLayout>
               <AbsoluteLayout class="ready-description">
-                <Image @tap="change_description()" v-show="save_description" src="res://icon_ready" stretch="aspectFill"/>
+                <Image @tap="change_description_button()" v-show="save_description" src="res://icon_ready" stretch="aspectFill"/>
               </AbsoluteLayout>
               </StackLayout>
 
@@ -30,19 +33,19 @@
                 <StackLayout orientation="vertical" class="checklist">
                   <StackLayout orientation="horizontal" v-for="task in checklist" class="task" >
                     <AbsoluteLayout class="check">
-                      <Image @tap="task_finished(task.id)" v-if="task.finished" src="res://icon_yescheck" stretch="aspectFill"/>
-                      <Image @tap="task_finished(task.id)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
+                      <Image @tap="task_finished(task._id)" v-if="task.finished" src="res://icon_yescheck" stretch="aspectFill"/>
+                      <Image @tap="task_finished(task._id)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
                     </AbsoluteLayout>
-                    <Textview @focus="show_buttons_task(task.id)" @blur="show_buttons_task(task.id)" @textChange="text_change($event)" @returnPress="prueba()" returnKeyType="done" class="text-task" :text="task.task"/>
+                    <Textview v-show="!task.finished"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id)" @textChange="text_change($event)" class="text-task" :text="task.todo"/>
+                    <Textview v-show="task.finished"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
                     <AbsoluteLayout class="button_list">
-                      <Image v-show="task.edit" src="res://icon_ready" stretch="aspectFill"/>
+                      <Image v-show="task.edit && !task.finished" src="res://icon_ready" stretch="aspectFill"/>
                     </AbsoluteLayout>
                     <AbsoluteLayout class="button_list">
                       <Image v-show="task.edit" src="res://icon_trash" stretch="aspectFill"/>
                     </AbsoluteLayout>
                   </StackLayout>
                 </StackLayout>
-
                 <TextField class="new-task" hint="Enter text" />
                 <label :text="text_task_ckeck"/>
             </StackLayout>
@@ -52,52 +55,53 @@
 
 <script>
 import * as utils from "utils/utils";
+const httpModule = require("http");
+var querystring = require ("querystring");
+var direccion_data="https://pmanagerd.mybluemix.net/api/momantai/plam/t/"
 export default {
-  props: ["title", "direccion_data","direccion_socket","socketIO"],
+  props: ["id"],
 
+  created(){
+    httpModule.request({
+				url: direccion_data+this.id,
+				method:'GET'
+			}).then((response)=>{
+				var r = response.content.toJSON();
+        for (var a in r.task[0].todo){
+        r.task[0].todo[a].finished = false;
+        r.task[0].todo[a].edit = false;
+      }
+        this.checklist=r.task[0].todo
+			});
+
+  },
     data () {
         return {
-
           text_description_color:"white",
           text_description_edit:false,
           save_description:false,
+          save_title:false,
 
+          title:"asd",
           description:"tu que perro :v",
+
           text_task_ckeck:"",
 
-          checklist:[
-            {
-              id:"1",
-              task:"Hacer algo",
-              finished:false,
-              edit:false
-            },
-            {
-              id:"2",
-              task:"Hacer otraa cosa",
-              finished:false,
-              edit:false
-            },
-            {
-              id:"3",
-              task:"Terminar",
-              finished:false,
-              edit:false
-            },
-            {
-              id:"4",
-              task:"fpafwfawfbasfknaslfbasf",
-              finished:false,
-              edit:false
-            },
-          ],
+          checklist:[],
         };
     },
       methods: {
         text_change(args){
           this.text_task_ckeck=args.object["text"]
         },
-        edit_description(){
+        edit_title_text(){
+          if(this.save_title){
+          this.save_title=false;
+        }else{
+          this.save_title=true;
+        }
+        },
+        edit_description_text(){
           if(this.text_description_edit){
             this.text_description_edit=false
             this.text_description_color="white"
@@ -108,26 +112,9 @@ export default {
             this.save_description=true
           }
         },
-        change_description(){
-          this.text=this.description
-          utils.ad.dismissSoftInput();
-        },
-        task_finished(id){
-          for (var a in this.checklist){
-              if(this.checklist[a].id==id){
-                  if(this.checklist[a].finished==false){
-                      this.checklist[a].finished=true;
-                      break;
-                  }else{
-                      this.checklist[a].finished=false;
-                      break;
-                  }
-              }
-          }
-        },
         show_buttons_task(id){
           for (var a in this.checklist){
-              if(this.checklist[a].id==id){
+              if(this.checklist[a]._id==id){
                   if(this.checklist[a].edit==false){
                       this.checklist[a].edit=true;
                       break;
@@ -138,17 +125,32 @@ export default {
               }
           }
         },
-        change_task(){
-
-        }
-
+        task_finished(id){
+          for (var a in this.checklist){
+              if(this.checklist[a]._id==id){
+                  if(this.checklist[a].finished==false){
+                      this.checklist[a].finished=true;
+                      break;
+                  }else{
+                      this.checklist[a].finished=false;
+                      break;
+                  }
+              }
+          }
+        },
+        change_title_button(){
+          utils.ad.dismissSoftInput();
+        },
+        change_description_button(){
+          utils.ad.dismissSoftInput();
+        },
       },
 }
 </script>
 
 <style scoped>
 .action-bar{
-  height: 55em;
+
 }
 .return{
 	width: 15%;
@@ -156,11 +158,15 @@ export default {
 }
 .button-return{
 	height: 70%;
-	margin-top: 15%;
 }
 .title-page{
-	font-size: 20%;
+	font-size: 18em;
 	width:70%;
+  background-color: #4D7BC6;
+}
+.ready-title{
+  width: 15%;
+  height: 100%;
 }
 .description{
 margin-top: 10em;

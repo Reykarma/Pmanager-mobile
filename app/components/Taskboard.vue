@@ -24,21 +24,21 @@
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
-                <WrapLayout @tap="checklist(list.work,list._id)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
+                <WrapLayout @tap="checklist(list._id)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
 				    			<label class="title-cards" textWrap="true" :text="list.work"/>
                   <label class="progress-task" textWrap="true" text="8/10"/>
 
 									<WrapLayout class="content_components">
 										<AbsoluteLayout v-show="list.button" class="left_button">
-											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change(list.status,list._id, sai='m')"/>
+											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'m',m:''})"/>
 										</AbsoluteLayout>
 
-										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete(list._id)" v-show="list.button" class="Delete_button">
+										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete({_id:list._id, m:''})" v-show="list.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
 
 										<AbsoluteLayout v-show="list.button" class="right_button">
-											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change(list.status,list._id, sai='n' )" />
+											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'n',m:''})" />
 										</AbsoluteLayout>
 	                </WrapLayout>
 
@@ -60,10 +60,20 @@ var direccion_socket="https://pmanagerd.mybluemix.net/view"
 var direccion_data="https://pmanagerd.mybluemix.net/api/momantai/plam/task"
 var querystring = require ("querystring")
 var socketIO = new SocketIO(direccion_socket);
-socketIO.connect();
+socketIO.connect()
 const httpModule = require("http");
 export default {
-
+	mounted(){
+	socketIO.on('message', (msj)=>{
+		if(msj.typeAction=='changeStatus'){
+			this.change(msj);
+		}else if(msj.typeAction=='deleteTask'){
+			this.Delete(msj);
+		}else{
+			this.new_task(msj);
+		}
+	})
+	},
 	created(){
 		httpModule.request({
 				url: direccion_data,
@@ -86,7 +96,6 @@ export default {
     },
     methods: {
         Nuevo(status) {
-						this.id=this.id+1
             this.$showModal(ModalComponent, { props: { status: status, id:this.id} }).then(
                 data => {
                     if (data.Titulo != "") {
@@ -105,18 +114,36 @@ export default {
                 }
             );
         },
-        Delete(id) {
+				new_task(data){
+					if (data.work != "") {
+							this.tasks.push({
+							_id: data._id,
+							status: data.status,
+							work: data.work,
+							button: false,
+						});
+					}
+				},
+        Delete(data) {
+					if(data.m==''){
 					httpModule.request({
 							url: direccion_data,
 							method: 'PUT',
 							content: querystring.stringify({
-								'_id': id,
+								'_id':data._id,
 								'm': 'rm',
 								'typeAction':'deleteTask',
 								'action':'delete'
 							})
 						});
-
+					}else{
+						for (var a in this.tasks) {
+							if (data.id==this.tasks[a]._id){
+									this.tasks.splice(a,1);
+									break;
+							}
+						}
+					}
         },
         showbutton(id) {
             for (var a in this.tasks){
@@ -131,52 +158,45 @@ export default {
                 }
             }
         },
-				change(status,id,sai){
+				change(data){
+					if(data.m==""){
 					httpModule.request({
 							url: direccion_data,
 							method: 'PUT',
 							content: querystring.stringify({
-								'_id': id,
-								'status': status,
+								'_id':data._id,
+								'status': data.status,
 								'm': 'rm',
-								'move':sai,
+								'move':data.sai,
 								'typeAction':'changeStatus'
 							})
 						});
+					}else{
+						for(var a in this.tasks){
+							if(data._id==this.tasks[a]._id){
+								this.tasks[a].status=data.status
+								break;
+							}
+						}
+					}
 				},
-				checklist(title){
-					this.$navigateTo(checklist,{ props: { title: title, direccion_data:direccion_data,direccion_socket:direccion_socket,socketIO:socketIO }});
+				checklist(id){
+					this.$navigateTo(checklist,{ props: { id:id }});
 				},
-				prueba(){
-			//	socketIO.emit("message","te la ");
-				httpModule.request({
-						url: direccion_data,
-						method: 'POST',
-						content: querystring.stringify({
-							'_id': '172eb287dbw871wbbwd78d',
-							'work': 'Prueba, ejemplo',
-							'status': 'backlog',
-							'm': 'rm',
-							'typeAction': 'create'
-						})
-					});
-    }
 	}
 }
 </script>
 
 <style scoped>
-.action-bar{
-height: 55em;
-}
 
+.action-bar{
+}
 .return{
 	width: 15%;
 	height: 100%;
 }
 .button-return{
 	height: 70%;
-	margin-top: 15%;
 }
 .title-page{
 	font-size: 20%;
@@ -184,11 +204,10 @@ height: 55em;
 }
 .top-menu{
 	width:40%;
-	height: 100%;
+	height:40em;
 }
 .button-calendar{
-	height: 70%;
-	margin-top: 15%;
+	height: 40em;
 	margin-left: 75%;
 }
 .container {
@@ -275,5 +294,4 @@ height: 55em;
 .left_button{
 	margin-left: 2%;
 }
-
 </style>
