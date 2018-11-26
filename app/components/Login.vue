@@ -1,14 +1,14 @@
 <template>
   <Page backgroundColor="#ededed" androidStatusBarBackground="#3b63a4" class="page">
-    <ActionBar backgroundColor="#dfd6da" title="Iniciar sesión" />
+    <ActionBar backgroundColor="#dfd6da" title="Inicar Sesión" />
     <ScrollView>
     <FlexboxLayout flexDirection="column" class="login">
       <StackLayout class="image">
         <label class="images" />
       </StackLayout>
       <label textWrap="true" class="Text-login" text="P-Manager "/>
-      <TextField class="form-Login"  hint="Correo"/>
-      <TextField secure="true" class="form-Login" hint="Contraseña"/>
+      <TextField v-model="user" class="form-Login"  hint="Correo"/>
+      <TextField v-model="password" secure="true" class="form-Login" hint="Contraseña"/>
         <Button text="Aceptar" class="button-login" @tap="login()" />
     </FlexboxLayout>
   </ScrollView>
@@ -16,16 +16,38 @@
 </template>
 
 <script>
+require( "nativescript-localstorage" );
 import Taskboard from './Taskboard'
 export default {
     data () {
         return {
+          user:"",
+          password:"",
+          user_prueba:"armando45",
+          password_prueba:"123456789"
         };
     },
     methods:{
       login(){
-        this.$navigateTo(Taskboard);
-      }
+        if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
+          if(this.password==this.password_prueba){
+          localStorage.setItem('ID_user', "123")
+          localStorage.setItem('user',this.user)
+          this.$navigateTo(Taskboard);
+        }else{
+          alert('Contraseña Incorrecta')
+          .then(() => {
+            console.log("Alert dialog closed.");
+            });
+        }
+        }else{
+          alert('Usuario Incorrecto')
+          .then(() => {
+            console.log("Alert dialog closed.");
+            });
+        }
+
+      },
     }
 }
 </script>

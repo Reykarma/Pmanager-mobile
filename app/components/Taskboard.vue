@@ -53,6 +53,7 @@
 </template>
 
 <script>
+require( "nativescript-localstorage" );
 import ModalComponent from "./newtask";
 import checklist from "./checklist";
 var SocketIO = require('nativescript-socketio').SocketIO;
