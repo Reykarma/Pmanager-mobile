@@ -8,7 +8,7 @@
       </StackLayout>
       <label textWrap="true" class="Text-login" text="P-Manager "/>
       <TextField v-model="user" class="form-Login"  hint="Correo"/>
-      <TextField v-model="password" secure="true" class="form-Login" hint="Contraseña"/>
+      <TextField @returnPress="login()" v-model="password" secure="true" class="form-Login" hint="Contraseña"/>
         <Button text="Aceptar" class="button-login" @tap="login()" />
     </FlexboxLayout>
   </ScrollView>
@@ -17,13 +17,13 @@
 
 <script>
 require( "nativescript-localstorage" );
-import Taskboard from './Taskboard'
+import projects from './projects'
 export default {
     data () {
         return {
           user:"",
           password:"",
-          user_prueba:"armando45",
+          user_prueba:"momantai",
           password_prueba:"123456789"
         };
     },
@@ -32,8 +32,8 @@ export default {
         if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
           if(this.password==this.password_prueba){
           localStorage.setItem('ID_user', "123")
-          localStorage.setItem('user',this.user)
-          this.$navigateTo(Taskboard);
+          localStorage.setItem('user',this.user.toLowerCase())
+          this.$navigateTo(projects,{transition:{name:"slideleft",duration:300}});
         }else{
           alert('Contraseña Incorrecta')
           .then(() => {

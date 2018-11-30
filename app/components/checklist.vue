@@ -5,7 +5,7 @@
           <AbsoluteLayout class="return">
             <Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
           </AbsoluteLayout>
-            <Textview @focus="edit_title_text()" @blur="edit_title_text()" verticalAlignment="center" class="title-page" :text="title" fontWeight="bold"/>
+            <Textview @focus="edit_title_text()" @blur="edit_title_text()" verticalAlignment="center" class="title-page" v-model="title" fontWeight="bold"/>
             <AbsoluteLayout class="ready-title">
               <Image @tap="change_title_button()" v-show="save_title" src="res://icon_ready" stretch="aspectFill"/>
             </AbsoluteLayout>
@@ -33,21 +33,21 @@
                 <StackLayout orientation="vertical" class="checklist">
                   <StackLayout orientation="horizontal" v-for="task in checklist" class="task" >
                     <AbsoluteLayout class="check">
-                      <Image @tap="task_finished(task._id)" v-if="task.finished" src="res://icon_yescheck" stretch="aspectFill"/>
-                      <Image @tap="task_finished(task._id)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
+                      <Image @tap="task_finished(task._id, task.check,task.todo)" v-if="task.check=='check'" src="res://icon_yescheck" stretch="aspectFill"/>
+                      <Image @tap="task_finished(task._id, task.check,task.todo)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
                     </AbsoluteLayout>
-                    <Textview v-show="!task.finished"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id)" @textChange="text_change($event)" class="text-task" :text="task.todo"/>
-                    <Textview v-show="task.finished"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
+                    <Textview v-show="task.check=='check'"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id),text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
+                    <Textview v-show="task.check==''" @focus="show_buttons_task(task._id),text_change($event)" @blur="show_buttons_task(task._id)" @textChange="text_change($event)" class="text-task" :text="task.todo"/>
                     <AbsoluteLayout class="button_list">
-                      <Image v-show="task.edit && !task.finished" src="res://icon_ready" stretch="aspectFill"/>
+                      <Image @tap="edit_todo(task._id, task.check)" v-show="task.edit && task.check==''" src="res://icon_ready" stretch="aspectFill"/>
                     </AbsoluteLayout>
                     <AbsoluteLayout class="button_list">
-                      <Image v-show="task.edit" src="res://icon_trash" stretch="aspectFill"/>
+                      <Image @tap="delete_todo(task._id)" v-show="task.edit" src="res://icon_trash" stretch="aspectFill"/>
                     </AbsoluteLayout>
                   </StackLayout>
                 </StackLayout>
-                <TextField class="new-task" hint="Enter text" />
-                <label :text="text_task_ckeck"/>
+                <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Enter text" />
+                <label class="text-prueba" :text="text_task_ckeck"/>
             </StackLayout>
           </ScrollView>
     </Page>
@@ -55,20 +55,21 @@
 
 <script>
 import * as utils from "utils/utils";
+import Taskboard from './Taskboard';
 const httpModule = require("http");
 var querystring = require ("querystring");
-var direccion_data="https://pmanagerd.mybluemix.net/api/momantai/plam/t/"
+var direccion_data="https://pmanagerd.mybluemix.net/api/"
 export default {
-  props: ["id"],
+  props: ["user","project","id","work"],
 
   created(){
     httpModule.request({
-				url: direccion_data+this.id,
+				url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
 				method:'GET'
 			}).then((response)=>{
 				var r = response.content.toJSON();
+        this.description=r.task[0].description
         for (var a in r.task[0].todo){
-        r.task[0].todo[a].finished = false;
         r.task[0].todo[a].edit = false;
       }
         this.checklist=r.task[0].todo
@@ -82,9 +83,9 @@ export default {
           save_description:false,
           save_title:false,
 
-          title:"asd",
-          description:"tu que perro :v",
-
+          title:this.work,
+          description:"",
+          newtodo:"",
           text_task_ckeck:"",
 
           checklist:[],
@@ -125,8 +126,45 @@ export default {
               }
           }
         },
-        task_finished(id){
-          for (var a in this.checklist){
+        task_finished(id,check,todo){
+          if(check==""){
+          httpModule.request({
+							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+							method: 'PUT',
+							content: querystring.stringify({
+								'action':'todo',
+                'actodo':'update',
+                '_id':id,
+                'todo':todo,
+                'check':"check",
+							})
+  					})
+            for (var a in this.checklist) {
+              if (id==this.checklist[a]._id){
+                  this.checklist[a].check="check";
+                  break;
+              }
+            }
+          }else{
+            httpModule.request({
+                url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+                method: 'PUT',
+                content: querystring.stringify({
+                  'action':'todo',
+                  'actodo':'update',
+                  '_id':id,
+                  'todo':todo,
+                  'check':"",
+                })
+              })
+              for (var a in this.checklist) {
+                if (id==this.checklist[a]._id){
+                    this.checklist[a].check="";
+                    break;
+                }
+              }
+          }
+          /* for (var a in this.checklist){
               if(this.checklist[a]._id==id){
                   if(this.checklist[a].finished==false){
                       this.checklist[a].finished=true;
@@ -136,14 +174,77 @@ export default {
                       break;
                   }
               }
-          }
+          }*/
         },
         change_title_button(){
+          httpModule.request({
+							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+							method: 'PUT',
+							content: querystring.stringify({
+                'newTitle':this.title,
+                'action':'title',
+							})
+  					});
           utils.ad.dismissSoftInput();
         },
         change_description_button(){
+          httpModule.request({
+							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+							method: 'PUT',
+							content: querystring.stringify({
+                'newDescription':this.description,
+                'action':'description',
+							})
+  					});
           utils.ad.dismissSoftInput();
         },
+        edit_todo(id, check){
+          utils.ad.dismissSoftInput();
+          httpModule.request({
+							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+							method: 'PUT',
+							content: querystring.stringify({
+								'action':'todo',
+                'actodo':'update',
+                '_id':id,
+                'todo':this.text_task_ckeck,
+                'check':check,
+							})
+  					});
+        },
+        new_todo(){
+          httpModule.request({
+							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+							method: 'PUT',
+							content: querystring.stringify({
+								'action':'todo',
+                'actodo':'create',
+                'todo':this.newtodo,
+							})
+  					}).then((response)=>{
+              var r=response.content.toJSON()
+              r.edit=false
+              this.checklist.push(r)
+              this.newtodo=""
+            })
+        },
+        delete_todo(id){
+          httpModule.request({
+							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+							method: 'PUT',
+							content: querystring.stringify({
+								'action':'todo',
+                'actodo':'delete',
+                '_id':id,
+							})
+  					});
+            for (var a in this.checklist) {
+							if (id==this.checklist[a]._id){
+									this.checklist.splice(a,1);
+									break;
+							}
+						}
+        }
       },
 }
 </script>
@@ -231,5 +332,11 @@ background-color: white;
 }
 .new-task{
   margin-top: 10em;
+  margin-bottom: 20em;
+  border-width: 0 0 2 0;
+  border-bottom-color: #33af14;
+}
+.text-prueba{
+  margin-bottom: 10em;
 }
 </style>

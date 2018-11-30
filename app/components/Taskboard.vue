@@ -3,7 +3,7 @@
 		<ActionBar class="action-bar" backgroundColor="#4D7BC6" color="white">
 			<WrapLayout orientation="horizontal">
 				<AbsoluteLayout class="return">
-					<Image class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
+					<Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
 				</AbsoluteLayout>
 					<label verticalAlignment="center" class="title-page" textWrap="true" text="P-Manager" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
@@ -18,13 +18,13 @@
 					<AbsoluteLayout class="Title-list">
 						<label verticalAlignment="center" textWrap="true" :text="status" fontWeight="bold"/>
 						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(status)">
-							<Image class="button_add" src="res://icon_add" stretch="aspectFill" verticalAlignment="center" />
+							<Image class="button_add" src="res://icon_add" stretch="aspectFill" verticalAlignment="center"/>
 						</AbsoluteLayout>
           </AbsoluteLayout>
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
-                <WrapLayout @tap="checklist(list._id)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
+                <WrapLayout @tap="checklist(list._id, list.work)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
 				    			<label class="title-cards" textWrap="true" :text="list.work"/>
                   <label class="progress-task" textWrap="true" text="8/10"/>
 
@@ -56,20 +56,26 @@
 require( "nativescript-localstorage" );
 import ModalComponent from "./newtask";
 import checklist from "./checklist";
+import projects from './projects';
 var SocketIO = require('nativescript-socketio').SocketIO;
 var direccion_socket="https://pmanagerd.mybluemix.net/view"
-var direccion_data="https://pmanagerd.mybluemix.net/api/momantai/plam/task"
+var direccion_data="https://pmanagerd.mybluemix.net/api/"
 var querystring = require ("querystring")
 var socketIO = new SocketIO(direccion_socket);
 socketIO.connect()
 const httpModule = require("http");
 export default {
+
+props: ["user", "project"],
+
 	mounted(){
 	socketIO.on('message', (msj)=>{
 		if(msj.typeAction=='changeStatus'){
 			this.change(msj);
 		}else if(msj.typeAction=='deleteTask'){
 			this.Delete(msj);
+		}else if(msj.typeAction=='title'){
+			this.update_title(msj);
 		}else{
 			this.new_task(msj);
 		}
@@ -77,7 +83,7 @@ export default {
 	},
 	created(){
 		httpModule.request({
-				url: direccion_data,
+				url: direccion_data+this.user+"/"+this.project+"/task",
 				method:'GET'
 			}).then((response)=>{
 				var r = response.content.toJSON();
@@ -96,12 +102,20 @@ export default {
         };
     },
     methods: {
+			update_title(data){
+				for (var a in this.tasks) {
+					if (data._id==this.tasks[a]._id){
+							this.tasks[a].work=data.work
+							break;
+					}
+				}
+			},
         Nuevo(status) {
             this.$showModal(ModalComponent, { props: { status: status, id:this.id} }).then(
                 data => {
                     if (data.Titulo != "") {
 												httpModule.request({
-														url: direccion_data,
+														url:  direccion_data+this.user+"/"+this.project+"/task",
 														method: 'POST',
 														content: querystring.stringify({
 														'work': data.Titulo,
@@ -128,7 +142,7 @@ export default {
         Delete(data) {
 					if(data.m==''){
 					httpModule.request({
-							url: direccion_data,
+							url:  direccion_data+this.user+"/"+this.project+"/task",
 							method: 'PUT',
 							content: querystring.stringify({
 								'_id':data._id,
@@ -162,7 +176,7 @@ export default {
 				change(data){
 					if(data.m==""){
 					httpModule.request({
-							url: direccion_data,
+							url:  direccion_data+this.user+"/"+this.project+"/task",
 							method: 'PUT',
 							content: querystring.stringify({
 								'_id':data._id,
@@ -181,8 +195,8 @@ export default {
 						}
 					}
 				},
-				checklist(id){
-					this.$navigateTo(checklist,{ props: { id:id }});
+				checklist(id, work){
+					this.$navigateTo(checklist,{transition:{name:"slideleft",duration:400}, props: {user:this.user, project:this.project, id:id, work:work }});
 				},
 	}
 }
