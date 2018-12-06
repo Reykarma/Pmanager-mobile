@@ -10,10 +10,13 @@
     </ActionBar>
     <ScrollView>
     <FlexboxLayout flexDirection="column" class="projects">
-      <StackLayout orientation="horizontal" v-for="project in projects" @tap="go_project(project.project)" class="project-card">
-        <label textWrap="true" class="project-name" text="plam" />
-        <AbsoluteLayout class="button_edit">
-          <Image  src="res://icon_edit" stretch="aspectFill"/>
+      <StackLayout  orientation="horizontal" v-for="project in projects" @longPress="show_buttons(project._id)" @tap="go_project(project.project)" class="project-card">
+        <label textWrap="true" class="project-name" :text="project.project" />
+        <AbsoluteLayout v-show="project.buttons" class="button_edit">
+          <Image class="buttons" src="res://icon_edit" stretch="aspectFill"/>
+        </AbsoluteLayout>
+        <AbsoluteLayout v-show="project.buttons" class="button_delete">
+          <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
         </AbsoluteLayout>
       </StackLayout>
     </FlexboxLayout>
@@ -30,10 +33,12 @@ export default {
         return {
           ID_user:localStorage.getItem('ID_user'),
           user:localStorage.getItem('user'),
+          prueba:"",
           projects:[
             {
-              id_project:"12312",
+              _id:"12312",
               project:"plam",
+              buttons:false,
             }
           ]
         };
@@ -41,6 +46,19 @@ export default {
     methods:{
       go_project(project){
         this.$navigateTo(Taskboard,{transition:{name:"slideleft",duration:400}, props: { user:this.user,project:project}});
+      },
+      show_buttons(id){
+        for(var a in this.projects){
+          if(this.projects[a]._id==id){
+            if(!this.projects[a].buttons){
+                this.projects[a].buttons=true
+                break
+              }else{
+                this.projects[a].buttons=false
+                break
+              }
+            }
+          }
       },
       logout(){
         localStorage.clear();
@@ -79,11 +97,18 @@ export default {
   font-size: 25em;
   margin-left: 20em;
   color: black;
-  background-color: red;
   vertical-align: center;
+  width: 60%;
 }
 .button_edit{
-  height: 40em;
+  height: 35em;
+  margin-left: 15em;
 }
-
+.button_delete{
+  height: 35em;
+  margin-left: 20em;
+}
+.buttons{
+  height: 100%;
+}
 </style>

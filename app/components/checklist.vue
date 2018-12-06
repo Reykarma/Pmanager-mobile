@@ -116,7 +116,7 @@ export default {
         show_buttons_task(id){
           for (var a in this.checklist){
               if(this.checklist[a]._id==id){
-                  if(this.checklist[a].edit==false){
+                  if(!this.checklist[a].edit){
                       this.checklist[a].edit=true;
                       break;
                   }else{

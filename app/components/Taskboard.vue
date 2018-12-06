@@ -163,7 +163,7 @@ props: ["user", "project"],
         showbutton(id) {
             for (var a in this.tasks){
                 if(this.tasks[a]._id==id){
-                    if(this.tasks[a].button==false){
+                    if(!this.tasks[a].button){
                         this.tasks[a].button=true;
 												break;
                     }else{
