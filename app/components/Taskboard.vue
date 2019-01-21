@@ -7,7 +7,7 @@
 				</AbsoluteLayout>
 					<label verticalAlignment="center" class="title-page" textWrap="true" text="P-Manager" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
-						<Image @tap="prueba()" class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
+						<Image @tap="check_network()" class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
 					</AbsoluteLayout>
 			</WrapLayout>
 		</ActionBar>
@@ -24,10 +24,9 @@
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout orientation="vertical" class="list">
-                <WrapLayout @tap="checklist(list._id, list.work)"  @longPress="showbutton(list._id)" v-if="list.status==status" v-for="list in tasks" class="cards" backgroundColor="white">
-				    			<label class="title-cards" textWrap="true" :text="list.work"/>
-                  <label class="progress-task" textWrap="true" text="8/10"/>
-
+                <WrapLayout v-if="list.status==status" @tap="checklist(list._id, list.work)" @longPress="showbutton(list._id)" v-for="list in tasks" class="cards" backgroundColor="white">
+				    			<label  class="title-cards" textWrap="true" :text="list.work"/>
+                  <label  class="progress-task" textWrap="true" text="8/10"/>
 									<WrapLayout class="content_components">
 										<AbsoluteLayout v-show="list.button" class="left_button">
 											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'m',m:''})"/>
@@ -61,13 +60,23 @@ var SocketIO = require('nativescript-socketio').SocketIO;
 var direccion_socket="https://pmanagerd.mybluemix.net/view"
 var direccion_data="https://pmanagerd.mybluemix.net/api/"
 var querystring = require ("querystring")
+var Toast = require("nativescript-toast");
+require( "nativescript-localstorage" );
 var socketIO = new SocketIO(direccion_socket);
-socketIO.connect()
 const httpModule = require("http");
+const connectivity = require("tns-core-modules/connectivity");
 export default {
 
 props: ["user", "project"],
-
+data() {
+		return {
+				status: ["Backlog", "Progress", "Review", "Stop"],
+				tasks: [],
+				id:0,
+				adios:"",
+				mostrar:false
+		};
+},
 	mounted(){
 	socketIO.on('message', (msj)=>{
 		if(msj.typeAction=='changeStatus'){
@@ -82,26 +91,38 @@ props: ["user", "project"],
 	})
 	},
 	created(){
-		httpModule.request({
-				url: direccion_data+this.user+"/"+this.project+"/task",
-				method:'GET'
-			}).then((response)=>{
-				var r = response.content.toJSON();
-				for (var a in r.task){
-				r.task[a].button = false;
-			}
-				this.tasks = r.task;
-			});
+	this.check_network()
 	},
-    data() {
-        return {
-            status: ["Backlog", "Progress", "Review", "Stop"],
-            tasks: [],
-            id:0,
-						adios:""
-        };
-    },
     methods: {
+			check_network(){
+				const connectionType = connectivity.getConnectionType();
+				if(connectionType==connectivity.connectionType.none){
+					alert({
+		  			title: "Sin Conexion",
+		  			message: "asegúrese de estar conectado a internet",
+		  			okButtonText: "Reintentar"
+						}).then(() => {
+		  				this.check_network()
+							return false
+						});
+				}else{
+					this.load_page()
+					return true
+				}
+			},
+			load_page(){
+				socketIO.connect()
+				httpModule.request({
+						url: direccion_data+this.user+"/"+this.project+"/task",
+						method:'GET'
+					}).then((response)=>{
+						var r = response.content.toJSON();
+						for (var a in r.task){
+						r.task[a].button = false;
+					}
+						this.tasks = r.task;
+					});
+			},
 			update_title(data){
 				for (var a in this.tasks) {
 					if (data._id==this.tasks[a]._id){
@@ -137,6 +158,7 @@ props: ["user", "project"],
 							work: data.work,
 							button: false,
 						});
+						Toast.makeText("Tarea Agregada").show();
 					}
 				},
         Delete(data) {
@@ -190,6 +212,7 @@ props: ["user", "project"],
 						for(var a in this.tasks){
 							if(data._id==this.tasks[a]._id){
 								this.tasks[a].status=data.status
+								this.tasks[a].button=false
 								break;
 							}
 						}

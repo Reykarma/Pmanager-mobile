@@ -4,7 +4,7 @@
     <ScrollView>
     <FlexboxLayout flexDirection="column" class="login">
       <StackLayout class="image">
-        <label class="images" />
+        <Image src="res://img_login" stretch="aspectFill"/>
       </StackLayout>
       <label textWrap="true" class="Text-login" text="P-Manager "/>
       <TextField v-model="user" class="form-Login"  hint="Correo"/>
@@ -55,15 +55,12 @@ export default {
 <style scoped>
 
 .image{
-  margin-top: 70em;
+  margin-top: 40em;
   height:120em;
   width: 90em;
 }
-.images{
-  height: 130em;
-  width:130em;
-  border-radius: 30em;
-  background-color:#2872ec;
+.image image{
+  width: 120em;
 }
 .Text-login{
   margin-top: 25em;
@@ -83,7 +80,7 @@ export default {
 .button-login{
   border-radius: 10em;
   background-color:#2872ec;
-  margin-top: 40em;
+  margin-top: 50em;
   text-align: center;
   font-size: 20em;
   margin-left: 20em;

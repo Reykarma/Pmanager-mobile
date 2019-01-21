@@ -10,10 +10,11 @@
     </ActionBar>
     <ScrollView>
     <FlexboxLayout flexDirection="column" class="projects">
+      <Button @tap="new_edit_project('create','')" class="new-project" text="Nuevo proyecto"/>
       <StackLayout  orientation="horizontal" v-for="project in projects" @longPress="show_buttons(project._id)" @tap="go_project(project.project)" class="project-card">
         <label textWrap="true" class="project-name" :text="project.project" />
         <AbsoluteLayout v-show="project.buttons" class="button_edit">
-          <Image class="buttons" src="res://icon_edit" stretch="aspectFill"/>
+          <Image @tap="new_edit_project('edit',project.project)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
         </AbsoluteLayout>
         <AbsoluteLayout v-show="project.buttons" class="button_delete">
           <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
@@ -28,6 +29,7 @@
 require( "nativescript-localstorage" );
 import Taskboard from './Taskboard'
 import Login from './Login'
+import ModalComponent from "./newproject"
 export default {
     data () {
         return {
@@ -62,7 +64,19 @@ export default {
       },
       logout(){
         localStorage.clear();
-        this.$navigateTo(Login)
+        this.$navigateTo(Login,{transition:{name:"slideright",duration:300}})
+      },
+      new_edit_project(action,title){
+        this.$showModal(ModalComponent,{props:{action:action,title:title}}).then(
+          data=>{
+            if(data.action=="create" && data.Titulo!=""){
+              this.projects.push({
+                _id:"2365",
+                project:data.Titulo,
+                buttons:false
+              });
+            }
+          })
       },
     }
 }
@@ -84,18 +98,25 @@ export default {
   height: 100%;
   vertical-align: center;
 }
+.new-project{
+  border-radius: 20px;
+  margin: 15em 40em 0 40em;
+  background-color: #b3b3b3;
+  height: 40em;
+}
 .project-card{
   height: 60em;
-  border-radius: 10em;
-  background-color: #dadada;
+  border-width: 1 0 1 0;
+  border-bottom-color: gray;
+  border-top-color: gray;
   vertical-align: center;
-  margin: 20em 10em 0 10em;
+  margin: 15em 10em 0 10em;
 }
 .project-name{
   font-weight: bold;
   font-style: italic;
   font-size: 25em;
-  margin-left: 20em;
+  margin-left: 25em;
   color: black;
   vertical-align: center;
   width: 60%;

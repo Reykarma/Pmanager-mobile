@@ -46,7 +46,7 @@
                     </AbsoluteLayout>
                   </StackLayout>
                 </StackLayout>
-                <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Enter text" />
+                <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Nueva Subtarea" />
                 <label class="text-prueba" :text="text_task_ckeck"/>
             </StackLayout>
           </ScrollView>
@@ -59,6 +59,7 @@ import Taskboard from './Taskboard';
 const httpModule = require("http");
 var querystring = require ("querystring");
 var direccion_data="https://pmanagerd.mybluemix.net/api/"
+var Toast = require("nativescript-toast");
 export default {
   props: ["user","project","id","work"],
 
@@ -226,6 +227,7 @@ export default {
               r.edit=false
               this.checklist.push(r)
               this.newtodo=""
+              Toast.makeText("Elemento agregado").show();
             })
         },
         delete_todo(id){
@@ -241,6 +243,7 @@ export default {
             for (var a in this.checklist) {
 							if (id==this.checklist[a]._id){
 									this.checklist.splice(a,1);
+                  Toast.makeText("Elemento Eliminado").show();
 									break;
 							}
 						}
@@ -299,6 +302,7 @@ width: 85%;
 .title-work{
   margin-left: 10em;
   font-size: 20%;
+  color:black;
 }
 
 .checklist{
