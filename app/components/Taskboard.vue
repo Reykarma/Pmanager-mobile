@@ -91,7 +91,7 @@ data() {
 	})
 	},
 	created(){
-	this.check_network()
+	this.check_network();
 	},
     methods: {
 			check_network(){
@@ -228,16 +228,17 @@ data() {
 <style scoped>
 
 .action-bar{
+
 }
 .return{
 	width: 15%;
 	height: 100%;
 }
 .button-return{
-	height: 70%;
+	height: 40em;
 }
 .title-page{
-	font-size: 20%;
+	font-size: 20em;
 	width:30%;
 }
 .top-menu{
@@ -249,20 +250,19 @@ data() {
 	margin-left: 75%;
 }
 .container {
-    width: 350%;
-    height: 100%;
+    width: auto;
     background-Color:#014185;
 }
 .container-list{
-  width: 25%;
-  margin-top: 40px;
-  margin-bottom: 35px;
+  width: 320em;
+  margin-top: 10em;
+  margin-bottom: 8em;
 }
 .Title-list{
   border-radius: 10px 10px 0 0;
   margin-top: 25px;
   width: 90%;
-  height: 200px;
+  height: 50em;
   background-color: #f0e9e9;
   color: #000000;
 }

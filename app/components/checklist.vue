@@ -261,7 +261,7 @@ export default {
 	height: 100%;
 }
 .button-return{
-	height: 70%;
+	height: 40em;
 }
 .title-page{
 	font-size: 18em;
