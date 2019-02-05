@@ -31,18 +31,14 @@
 										<AbsoluteLayout v-show="list.button" class="left_button">
 											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'m',m:''})"/>
 										</AbsoluteLayout>
-
 										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete({_id:list._id, m:''})" v-show="list.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
-
 										<AbsoluteLayout v-show="list.button" class="right_button">
 											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'n',m:''})" />
 										</AbsoluteLayout>
 	                </WrapLayout>
-
                 </WrapLayout>
-
               </StackLayout>
             </ScrollView>
           </StackLayout>

@@ -1,5 +1,5 @@
 <template>
-  <Page backgroundColor="#ededed" androidStatusBarBackground="#3b63a4" class="page">
+  <Page backgroundColor="#e7e8ec" androidStatusBarBackground="#3b63a4" class="page">
     <ActionBar color="white" backgroundColor="#4D7BC6">
     <StackLayout orientation="horizontal">
       <label textWrap="true" class="page-title" :text="'Proyectos ' + user"/>
@@ -10,8 +10,8 @@
     </ActionBar>
     <ScrollView>
     <FlexboxLayout flexDirection="column" class="projects">
-      <Button @tap="new_edit_project('create','')" class="new-project" text="Nuevo proyecto"/>
-      <StackLayout  orientation="horizontal" v-for="project in projects" @longPress="show_buttons(project._id)" @tap="go_project(project.project)" class="project-card">
+      <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project._id)" @tap="go_project(project.project)" class="card" >
+      <StackLayout orientation="horizontal" class="control-card">
         <label textWrap="true" class="project-name" :text="project.project" />
         <AbsoluteLayout v-show="project.buttons" class="button_edit">
           <Image @tap="new_edit_project('edit',project.project)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
@@ -20,6 +20,18 @@
           <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
         </AbsoluteLayout>
       </StackLayout>
+      <StackLayout orientation="horizontal" class="details-project">
+        <AbsoluteLayout class="icons-details">
+          <Image class="buttons" src="res://tareas" stretch="aspectFill"/>
+        </AbsoluteLayout>
+        <label verticalAlignment="center" text="0 tareas"/>
+        <AbsoluteLayout class="icons-details">
+          <Image class="buttons" src="res://members" stretch="aspectFill"/>
+        </AbsoluteLayout>
+        <label verticalAlignment="center" text="1 miembro"/>
+      </StackLayout>
+      </StackLayout>
+      <Button @tap="new_edit_project('create','')" class="new-project" text="Nuevo proyecto"/>
     </FlexboxLayout>
   </ScrollView>
   </Page>
@@ -100,17 +112,26 @@ export default {
 }
 .new-project{
   border-radius: 20px;
-  margin: 15em 40em 0 40em;
+  margin: 15em 90em 0 90em;
   background-color: #b3b3b3;
   height: 40em;
 }
-.project-card{
+.card{
+  height: 100em;
+  margin: 18em 15em 0 15em;
+  background-color: white;
+  border-radius: 15px;
+}
+.control-card{
   height: 60em;
-  border-width: 1 0 1 0;
-  border-bottom-color: gray;
-  border-top-color: gray;
   vertical-align: center;
-  margin: 15em 10em 0 10em;
+}
+.details-project{
+  height: 40em;
+  text-align: center;
+}
+.icons-details{
+margin-left: 20em;
 }
 .project-name{
   font-weight: bold;
