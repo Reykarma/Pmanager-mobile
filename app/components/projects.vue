@@ -22,11 +22,11 @@
       </StackLayout>
       <StackLayout orientation="horizontal" class="details-project">
         <AbsoluteLayout class="icons-details">
-          <Image class="buttons" src="res://tareas" stretch="aspectFill"/>
+          <Image class="buttons" src="res://icon_tasks" stretch="aspectFill"/>
         </AbsoluteLayout>
         <label verticalAlignment="center" text="0 tareas"/>
         <AbsoluteLayout class="icons-details">
-          <Image class="buttons" src="res://members" stretch="aspectFill"/>
+          <Image class="buttons" src="res://icon_members" stretch="aspectFill"/>
         </AbsoluteLayout>
         <label verticalAlignment="center" text="1 miembro"/>
       </StackLayout>
