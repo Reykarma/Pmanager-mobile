@@ -8,13 +8,15 @@
     </AbsoluteLayout>
     </StackLayout>
     </ActionBar>
+
     <ScrollView>
-    <FlexboxLayout flexDirection="column" class="projects">
-      <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project._id)" @tap="go_project(project.project)" class="card" >
+    <FlexboxLayout flexDirection="column">
+      <StackLayout orientation="vertical">
+      <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.proyect_id)" @tap="go_project(project.proyect_id)" class="card" >
       <StackLayout orientation="horizontal" class="control-card">
-        <label textWrap="true" class="project-name" :text="project.project" />
+        <label textWrap="true" class="project-name" :text="project.title"/>
         <AbsoluteLayout v-show="project.buttons" class="button_edit">
-          <Image @tap="new_edit_project('edit',project.project)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
+          <Image @tap="new_edit_project('edit',project.title)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
         </AbsoluteLayout>
         <AbsoluteLayout v-show="project.buttons" class="button_delete">
           <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
@@ -31,7 +33,7 @@
         <label verticalAlignment="center" text="1 miembro"/>
       </StackLayout>
       </StackLayout>
-      <Button @tap="new_edit_project('create','')" class="new-project" text="Nuevo proyecto"/>
+      </StackLayout>
     </FlexboxLayout>
   </ScrollView>
   </Page>
@@ -42,6 +44,9 @@ require( "nativescript-localstorage" );
 import Taskboard from './Taskboard'
 import Login from './Login'
 import ModalComponent from "./newproject"
+import button from "./boton"
+const httpModule = require("http");
+var direccion_data="https://pmanagerd.mybluemix.net/api/projects/"
 export default {
     data () {
         return {
@@ -57,13 +62,25 @@ export default {
           ]
         };
     },
+    created(){
+      httpModule.request({
+          url: direccion_data+this.user,
+          method:'GET'
+        }).then((response)=>{
+          var projects = response.content.toJSON();
+          for (var a in projects){
+          projects[a].buttons = false;
+        }
+          this.projects = projects;
+        });
+    },
     methods:{
       go_project(project){
         this.$navigateTo(Taskboard,{transition:{name:"slideleft",duration:400}, props: { user:this.user,project:project}});
       },
       show_buttons(id){
         for(var a in this.projects){
-          if(this.projects[a]._id==id){
+          if(this.projects[a].proyect_id==id){
             if(!this.projects[a].buttons){
                 this.projects[a].buttons=true
                 break
@@ -140,7 +157,7 @@ margin-left: 20em;
   margin-left: 25em;
   color: black;
   vertical-align: center;
-  width: 60%;
+  width: 50%;
 }
 .button_edit{
   height: 35em;

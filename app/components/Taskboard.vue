@@ -56,7 +56,6 @@ var SocketIO = require('nativescript-socketio').SocketIO;
 var direccion_socket="https://pmanagerd.mybluemix.net/view"
 var direccion_data="https://pmanagerd.mybluemix.net/api/"
 var querystring = require ("querystring")
-var Toast = require("nativescript-toast");
 require( "nativescript-localstorage" );
 var socketIO = new SocketIO(direccion_socket);
 const httpModule = require("http");
@@ -154,7 +153,6 @@ data() {
 							work: data.work,
 							button: false,
 						});
-						Toast.makeText("Tarea Agregada").show();
 					}
 				},
         Delete(data) {
