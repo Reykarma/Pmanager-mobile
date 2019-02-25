@@ -9,33 +9,40 @@
     </StackLayout>
     </ActionBar>
 
-    <ScrollView>
-    <FlexboxLayout flexDirection="column">
-      <StackLayout orientation="vertical">
-      <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.proyect_id)" @tap="go_project(project.proyect_id)" class="card" >
-      <StackLayout orientation="horizontal" class="control-card">
-        <label textWrap="true" class="project-name" :text="project.title"/>
-        <AbsoluteLayout v-show="project.buttons" class="button_edit">
-          <Image @tap="new_edit_project('edit',project.title)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
-        </AbsoluteLayout>
-        <AbsoluteLayout v-show="project.buttons" class="button_delete">
-          <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
-        </AbsoluteLayout>
-      </StackLayout>
-      <StackLayout orientation="horizontal" class="details-project">
-        <AbsoluteLayout class="icons-details">
-          <Image class="buttons" src="res://icon_tasks" stretch="aspectFill"/>
-        </AbsoluteLayout>
-        <label verticalAlignment="center" text="0 tareas"/>
-        <AbsoluteLayout class="icons-details">
-          <Image class="buttons" src="res://icon_members" stretch="aspectFill"/>
-        </AbsoluteLayout>
-        <label verticalAlignment="center" text="1 miembro"/>
-      </StackLayout>
-      </StackLayout>
-      </StackLayout>
-    </FlexboxLayout>
-  </ScrollView>
+    <GridLayout class="container">
+      <GridLayout class="container-projects">
+        <ScrollView>
+          <StackLayout orientation="vertical">
+            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.proyect_id)" @tap="go_project(project.proyect_id)" class="card" >
+              <StackLayout orientation="horizontal" class="control-card">
+                <label textWrap="true" class="project-name" :text="project.title"/>
+                <AbsoluteLayout v-show="project.buttons" class="button_edit">
+                  <Image @tap="new_edit_project('edit',project.title)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
+                </AbsoluteLayout>
+                <AbsoluteLayout v-show="project.buttons" class="button_delete">
+                  <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
+                </AbsoluteLayout>
+              </StackLayout>
+              <StackLayout orientation="horizontal" class="details-project">
+                <AbsoluteLayout class="icons-details">
+                  <Image class="buttons" src="res://icon_tasks" stretch="aspectFill"/>
+                </AbsoluteLayout>
+                <label verticalAlignment="center" text="0 tareas"/>
+                <AbsoluteLayout class="icons-details">
+                  <Image class="buttons" src="res://icon_members" stretch="aspectFill"/>
+                </AbsoluteLayout>
+                <label verticalAlignment="center" text="1 miembros"/>
+              </StackLayout>
+            </StackLayout>
+            <AbsoluteLayout class="separador">
+            </AbsoluteLayout>
+          </StackLayout>
+          </ScrollView>
+          </GridLayout>
+          <AbsoluteLayout @tap="new_edit_project('create','')" class="button-container">
+            <Image class="buttons" src="res://icon_new" stretch="aspectFill"/>
+          </AbsoluteLayout>
+      </GridLayout>
   </Page>
 </template>
 
@@ -44,7 +51,6 @@ require( "nativescript-localstorage" );
 import Taskboard from './Taskboard'
 import Login from './Login'
 import ModalComponent from "./newproject"
-import button from "./boton"
 const httpModule = require("http");
 var direccion_data="https://pmanagerd.mybluemix.net/api/projects/"
 export default {
@@ -112,6 +118,9 @@ export default {
 </script>
 
 <style scoped>
+.separador{
+  height: 40em;
+}
 .page-title{
   width: 80%;
   vertical-align: center;
@@ -127,11 +136,28 @@ export default {
   height: 100%;
   vertical-align: center;
 }
+.container{
+width: auto;
+}
+.container-projects{
+  vertical-align: top;
+  height: 100%;
+  margin-bottom: 200px;
+}
+.button-container{
+  height: 55em;
+  width: 55em;
+  horizontal-align:right;
+  vertical-align: bottom;
+  margin-right: 20em;
+  margin-bottom: 14em;
+}
 .new-project{
   border-radius: 20px;
   margin: 15em 90em 0 90em;
   background-color: #b3b3b3;
   height: 40em;
+  horizontal-align:right;
 }
 .card{
   height: 100em;
