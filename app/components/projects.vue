@@ -150,7 +150,7 @@ width: auto;
   horizontal-align:right;
   vertical-align: bottom;
   margin-right: 20em;
-  margin-bottom: 14em;
+  margin-bottom: 18em;
 }
 .new-project{
   border-radius: 20px;

@@ -298,7 +298,9 @@ data() {
 .title-cards{
   width: 100%;
   height: auto;
-  text-align: justify;
+  text-align: center;
+	font-weight: bold;
+	font-size: 17em;
 }
 .progress-task{
   margin: 40px;

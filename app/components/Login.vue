@@ -1,16 +1,21 @@
 <template>
-  <Page backgroundColor="#ededed" androidStatusBarBackground="#3b63a4" class="page">
-    <ActionBar backgroundColor="#dfd6da" title="Inicar Sesión" />
+  <Page backgroundColor="#ededed" androidStatusBarBackground="#374152" class="page">
+    <ActionBar title="" backgroundColor="#3c495e" id="action-bar" flat="true" />
     <ScrollView>
-    <FlexboxLayout flexDirection="column" class="login">
-      <StackLayout class="image">
-        <Image src="res://img_login" stretch="aspectFill"/>
-      </StackLayout>
-      <label textWrap="true" class="Text-login" text="P-Manager "/>
-      <TextField v-model="user" class="form-Login"  hint="Correo"/>
-      <TextField @returnPress="login()" v-model="password" secure="true" class="form-Login" hint="Contraseña"/>
-        <Button text="Aceptar" class="button-login" @tap="login()" />
-    </FlexboxLayout>
+      <StackLayout backgroundColor="#3c495e">
+                <Image id="logo-icon" src="res://img_login"/>
+                <StackLayout id="form-login">
+                  <Label text="Correo" />
+                  <TextField v-model="user" keyboardType="email" class="inputs-login" hint="Correo" />
+                  <Label text="Contraseña" />
+                  <TextField v-model="password" secure="true" class="inputs-login" hint="Contraseña" />
+                  <Button @tap="login()" id="button-login" text="Login" />
+                </StackLayout>
+                <StackLayout id="options-login">
+                  <label textWrap="true" text="Register now"/>
+                  <label textWrap="true" text="Forgot your password?"/>
+                </StackLayout>
+            </StackLayout>
   </ScrollView>
   </Page>
 </template>
@@ -53,38 +58,45 @@ export default {
 </script>
 
 <style scoped>
+#action-bar{
+  height:40em;
+}
 
-.image{
-  margin-top: 40em;
-  height:120em;
-  width: 90em;
-}
-.image image{
-  width: 120em;
-}
-.Text-login{
-  margin-top: 25em;
-  text-align: center;
-  font-size: 23em;
-  height: 50em;
-  font-weight: bold;
-  color: black;
-  font-style: italic;
-}
-.form-Login{
+#logo-icon{
+  width: 140em;
   margin-top: 15em;
-  border-width: 0 0 2 0;
-  border-bottom-color: crimson;
-  text-align: center;
+  margin-bottom: 30em;
 }
-.button-login{
-  border-radius: 10em;
-  background-color:#2872ec;
-  margin-top: 50em;
+#form-login{
+  width: 85%;
+}
+#form-login label{
+  color: white;
+}
+.inputs-login{
+  color:#338dd7;
+      border-width: 1;
+      border-radius: 4;
+      border-color:#FFFFFF;
+      background-color:#FFFFFF;
+      placeholder-color: rgba(16, 50, 65, .45);
+      vertical-align: middle;
+      margin-bottom: 25em;
+}
+#button-login{
+margin-top: 15em;
+background-color: #3482d7;
+border-radius: 5em;
+color: white;
+}
+#options-login{
+  width: 80%;
+}
+#options-login label{
+  margin-top: 25em;
+  width: 55%;
   text-align: center;
-  font-size: 20em;
-  margin-left: 20em;
-  margin-right: 20em;
-  color:#e7e7e7;
+  color: white;
+  font-weight: bold;
 }
 </style>
