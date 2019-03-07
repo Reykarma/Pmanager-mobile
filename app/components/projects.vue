@@ -13,7 +13,7 @@
       <GridLayout class="container-projects">
         <ScrollView>
           <StackLayout orientation="vertical">
-            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.proyect_id)" @tap="go_project(project.proyect_id)" class="card" >
+            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.proyect_id)" @tap="go_project(project.proyect_id,project.title)" class="card" >
               <StackLayout orientation="horizontal" class="control-card">
                 <label textWrap="true" class="project-name" :text="project.title"/>
                 <AbsoluteLayout v-show="project.buttons" class="button_edit">
@@ -81,8 +81,8 @@ export default {
         });
     },
     methods:{
-      go_project(project){
-        this.$navigateTo(Taskboard,{transition:{name:"slideleft",duration:400}, props: { user:this.user,project:project}});
+      go_project(project,title){
+        this.$navigateTo(Taskboard,{transition:{name:"slideleft",duration:400}, props: { user:this.user,project:project,title:title}});
       },
       show_buttons(id){
         for(var a in this.projects){

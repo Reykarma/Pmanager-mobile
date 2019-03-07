@@ -5,7 +5,7 @@
 				<AbsoluteLayout class="return">
 					<Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
 				</AbsoluteLayout>
-					<label verticalAlignment="center" class="title-page" textWrap="true" text="P-Manager" fontWeight="bold"/>
+					<label verticalAlignment="center" class="title-page" textWrap="false" :text="title" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
 						<Image @tap="check_network()" class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
 					</AbsoluteLayout>
@@ -62,7 +62,7 @@ const httpModule = require("http");
 const connectivity = require("tns-core-modules/connectivity");
 export default {
 
-props: ["user", "project"],
+props: ["user", "project","title"],
 data() {
 		return {
 				status: ["Backlog", "Progress", "Review", "Stop"],
@@ -233,15 +233,15 @@ data() {
 }
 .title-page{
 	font-size: 20em;
-	width:30%;
+	width:50%;
 }
 .top-menu{
-	width:40%;
+	width:30%;
 	height:40em;
 }
 .button-calendar{
 	height: 40em;
-	margin-left: 75%;
+	margin-left: 65%;
 }
 .container {
     width: auto;

@@ -5,15 +5,18 @@
           <AbsoluteLayout class="return">
             <Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
           </AbsoluteLayout>
-            <Textview @focus="edit_title_text()" @blur="edit_title_text()" verticalAlignment="center" class="title-page" v-model="title" fontWeight="bold"/>
-            <AbsoluteLayout class="ready-title">
-              <Image @tap="change_title_button()" v-show="save_title" src="res://icon_ready" stretch="aspectFill"/>
-            </AbsoluteLayout>
+          <label verticalAlignment="center" class="title-page" textWrap="true" text="Tareas" fontWeight="bold"/>
         </WrapLayout>
       </ActionBar>
 
           <ScrollView orientation="vertical">
             <StackLayout orientation="vertical" class="properties">
+              <StackLayout orientation="horizontal">
+                <Textview @textChange="change_title_button()" @focus="edit_title_text()" @blur="edit_title_text()" verticalAlignment="center" class="title-task" v-model="title" fontWeight="bold"/>
+                <AbsoluteLayout class="ready-title">
+                  <Image @tap="change_title_button()" v-show="save_title" src="res://icon_ready" stretch="aspectFill"/>
+                </AbsoluteLayout>
+              </StackLayout>
               <StackLayout orientation="horizontal">
               <WrapLayout class="description">
               <Textview v-model="description" class="description-text" @focus="edit_description_text()" @blur="edit_description_text()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
@@ -36,7 +39,7 @@
                       <Image @tap="task_finished(task._id, task.check,task.todo)" v-if="task.check=='check'" src="res://icon_yescheck" stretch="aspectFill"/>
                       <Image @tap="task_finished(task._id, task.check,task.todo)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
                     </AbsoluteLayout>
-                    <Textview v-show="task.check=='check'"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id),text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
+                    <Textview editable="false" v-show="task.check=='check'"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id),text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
                     <Textview v-show="task.check==''" @focus="show_buttons_task(task._id),text_change($event)" @blur="show_buttons_task(task._id)" @textChange="text_change($event)" class="text-task" :text="task.todo"/>
                     <AbsoluteLayout class="button_list">
                       <Image @tap="edit_todo(task._id, task.check)" v-show="task.edit && task.check==''" src="res://icon_ready" stretch="aspectFill"/>
@@ -186,7 +189,7 @@ export default {
                 'action':'title',
 							})
   					});
-          utils.ad.dismissSoftInput();
+          //utils.ad.dismissSoftInput();
         },
         change_description_button(){
           httpModule.request({
@@ -212,6 +215,7 @@ export default {
                 'check':check,
 							})
   					});
+
         },
         new_todo(){
           httpModule.request({
@@ -263,12 +267,17 @@ export default {
 	height: 40em;
 }
 .title-page{
+  width: 85%;
+  font-size: 20em;
+}
+.title-task{
 	font-size: 18em;
-	width:70%;
+	width:100%;
   background-color: #4D7BC6;
+  color:white;
 }
 .ready-title{
-  width: 15%;
+  width: 10%;
   height: 100%;
 }
 .description{

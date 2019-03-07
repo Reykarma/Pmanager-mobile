@@ -8,7 +8,7 @@
                   <Label text="Correo" />
                   <TextField v-model="user" keyboardType="email" class="inputs-login" hint="Correo" />
                   <Label text="Contraseña" />
-                  <TextField v-model="password" secure="true" class="inputs-login" hint="Contraseña" />
+                  <TextField @returnPress="login()" v-model="password" secure="true" class="inputs-login" hint="Contraseña" />
                   <Button @tap="login()" id="button-login" text="Login" />
                 </StackLayout>
                 <StackLayout id="options-login">
