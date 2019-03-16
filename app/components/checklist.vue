@@ -12,18 +12,12 @@
           <ScrollView orientation="vertical">
             <StackLayout orientation="vertical" class="properties">
               <StackLayout orientation="horizontal">
-                <Textview @textChange="change_title_button()" @focus="edit_title_text()" @blur="edit_title_text()" verticalAlignment="center" class="title-task" v-model="title" fontWeight="bold"/>
-                <AbsoluteLayout class="ready-title">
-                  <Image @tap="change_title_button()" v-show="save_title" src="res://icon_ready" stretch="aspectFill"/>
-                </AbsoluteLayout>
+                <Textview @textChange="change_title_button()" verticalAlignment="center" class="title-task" v-model="title" fontWeight="bold"/>
               </StackLayout>
               <StackLayout orientation="horizontal">
               <WrapLayout class="description">
-              <Textview v-model="description" class="description-text" @focus="edit_description_text()" @blur="edit_description_text()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
+              <Textview @textChange="change_description_button()" v-model="description" class="description-text" @focus="edit_description_text()" @blur="edit_description_text()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
               </WrapLayout>
-              <AbsoluteLayout class="ready-description">
-                <Image @tap="change_description_button()" v-show="save_description" src="res://icon_ready" stretch="aspectFill"/>
-              </AbsoluteLayout>
               </StackLayout>
 
                 <StackLayout orientation="horizontal" class="work">
@@ -39,18 +33,12 @@
                       <Image @tap="task_finished(task._id, task.check,task.todo)" v-if="task.check=='check'" src="res://icon_yescheck" stretch="aspectFill"/>
                       <Image @tap="task_finished(task._id, task.check,task.todo)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
                     </AbsoluteLayout>
-                    <Textview editable="false" v-show="task.check=='check'"  @focus="show_buttons_task(task._id)" @blur="show_buttons_task(task._id),text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
-                    <Textview v-show="task.check==''" @focus="show_buttons_task(task._id),text_change($event)" @blur="show_buttons_task(task._id)" @textChange="text_change($event)" class="text-task" :text="task.todo"/>
-                    <AbsoluteLayout class="button_list">
-                      <Image @tap="edit_todo(task._id, task.check)" v-show="task.edit && task.check==''" src="res://icon_ready" stretch="aspectFill"/>
-                    </AbsoluteLayout>
-                    <AbsoluteLayout class="button_list">
-                      <Image @tap="delete_todo(task._id)" v-show="task.edit" src="res://icon_trash" stretch="aspectFill"/>
-                    </AbsoluteLayout>
+                    <Textview v-show="task.check=='check'" @blur="text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
+
+                    <Textview v-show="task.check==''" @focus="text_change($event)"  @textChange="text_change($event),edit_todo(task._id, task.check)" class="text-task" :text="task.todo"/>
                   </StackLayout>
                 </StackLayout>
                 <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Nueva Subtarea" />
-                <label class="text-prueba" :text="text_task_ckeck"/>
             </StackLayout>
           </ScrollView>
     </Page>
@@ -73,9 +61,6 @@ export default {
 			}).then((response)=>{
 				var r = response.content.toJSON();
         this.description=r.task[0].description
-        for (var a in r.task[0].todo){
-        r.task[0].todo[a].edit = false;
-      }
         this.checklist=r.task[0].todo
 			});
 
@@ -84,8 +69,6 @@ export default {
         return {
           text_description_color:"white",
           text_description_edit:false,
-          save_description:false,
-          save_title:false,
 
           title:this.work,
           description:"",
@@ -99,35 +82,13 @@ export default {
         text_change(args){
           this.text_task_ckeck=args.object["text"]
         },
-        edit_title_text(){
-          if(this.save_title){
-          this.save_title=false;
-        }else{
-          this.save_title=true;
-        }
-        },
         edit_description_text(){
           if(this.text_description_edit){
             this.text_description_edit=false
             this.text_description_color="white"
-            this.save_description=false
           }else{
             this.text_description_edit=true
             this.text_description_color=null
-            this.save_description=true
-          }
-        },
-        show_buttons_task(id){
-          for (var a in this.checklist){
-              if(this.checklist[a]._id==id){
-                  if(!this.checklist[a].edit){
-                      this.checklist[a].edit=true;
-                      break;
-                  }else{
-                      this.checklist[a].edit=false;
-                      break;
-                  }
-              }
           }
         },
         task_finished(id,check,todo){
@@ -149,6 +110,7 @@ export default {
                   break;
               }
             }
+            utils.ad.dismissSoftInput();
           }else{
             httpModule.request({
                 url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
@@ -167,6 +129,7 @@ export default {
                     break;
                 }
               }
+            utils.ad.dismissSoftInput();
           }
           /* for (var a in this.checklist){
               if(this.checklist[a]._id==id){
@@ -200,10 +163,10 @@ export default {
                 'action':'description',
 							})
   					});
-          utils.ad.dismissSoftInput();
+          //utils.ad.dismissSoftInput();
         },
         edit_todo(id, check){
-          utils.ad.dismissSoftInput();
+          //utils.ad.dismissSoftInput();
           httpModule.request({
 							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
 							method: 'PUT',
@@ -283,7 +246,7 @@ export default {
 .description{
 margin-top: 10em;
 margin-bottom: 10em;
-width: 85%;
+width: 100%;
 }
 .description-text{
   width: 100%;
@@ -343,10 +306,12 @@ background-color: white;
   margin-left: 5em;
 }
 .new-task{
-  margin-top: 10em;
   margin-bottom: 20em;
   border-width: 0 0 2 0;
-  border-bottom-color: #33af14;
+  border-bottom-color: white;
+  border-radius: 25px;
+  background-color: #f1f1f1;
+  width: 95%;
 }
 .text-prueba{
   margin-bottom: 10em;
