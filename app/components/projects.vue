@@ -186,7 +186,7 @@ margin-left: 20em;
   width: 50%;
 }
 .button_edit{
-  height: 35em;
+  height: 30em;
   margin-left: 15em;
 }
 .button_delete{

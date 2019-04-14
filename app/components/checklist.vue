@@ -1,47 +1,51 @@
 <template>
-    <Page class="page" statusBarstyle="light" androidStatusBarBackground="#3b63a4" backgroundSpanUnderStatusBar="true">
-      <ActionBar class="action-bar" backgroundColor="#4D7BC6" color="white">
-        <WrapLayout orientation="horizontal">
-          <AbsoluteLayout class="return">
-            <Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
+  <Page class="page" statusBarstyle="light" androidStatusBarBackground="#3b63a4" backgroundSpanUnderStatusBar="true">
+    <ActionBar class="action-bar" backgroundColor="#4D7BC6" color="white">
+      <WrapLayout orientation="horizontal">
+        <AbsoluteLayout class="return">
+          <Image @tap="$navigateBack" class="button-return"  src="res://icon_back" stretch="aspectFill" verticalAlignment="center" />
+        </AbsoluteLayout>
+        <label verticalAlignment="center" class="title-page" textWrap="true" text="Tareas" fontWeight="bold"/>
+      </WrapLayout>
+    </ActionBar>
+
+    <ScrollView orientation="vertical">
+      <StackLayout orientation="vertical" class="properties">
+        <StackLayout orientation="horizontal">
+          <Textview @textChange="change_title_button()" verticalAlignment="center" class="title-task" v-model="title" fontWeight="bold"/>
+        </StackLayout>
+        <StackLayout orientation="horizontal">
+          <WrapLayout class="description">
+            <Textview @textChange="change_description_button()" v-model="description" class="description-text" @focus="edit_description_text()" @blur="edit_description_text()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
+          </WrapLayout>
+        </StackLayout>
+
+        <StackLayout orientation="horizontal" class="work">
+          <AbsoluteLayout class="logo-list">
+            <Image src="res://icon_checklist" stretch="aspectFill"/>
           </AbsoluteLayout>
-          <label verticalAlignment="center" class="title-page" textWrap="true" text="Tareas" fontWeight="bold"/>
-        </WrapLayout>
-      </ActionBar>
+          <label verticalAlignment="center" class="title-work" textWrap="true" text="Checklist" fontWeight="bold"/>
+        </StackLayout>
 
-          <ScrollView orientation="vertical">
-            <StackLayout orientation="vertical" class="properties">
+        <StackLayout orientation="vertical" class="checklist">
+          <StackLayout orientation="horizontal" v-for="task in checklist" class="task" >
+              <AbsoluteLayout class="check">
+                <Image @tap="task_finished(task._id, task.check,task.todo)" v-if="task.check=='check'" src="res://icon_yescheck" stretch="aspectFill"/>
+                <Image @tap="task_finished(task._id, task.check,task.todo)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
+              </AbsoluteLayout>
               <StackLayout orientation="horizontal">
-                <Textview @textChange="change_title_button()" verticalAlignment="center" class="title-task" v-model="title" fontWeight="bold"/>
+                <Textview editable="false" v-show="task.check=='check'" @blur="text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
+                <Textview v-show="task.check==''" @focus="text_change($event)"  @textChange="text_change($event),edit_todo(task._id, task.check)" class="text-task" :text="task.todo"/>
               </StackLayout>
-              <StackLayout orientation="horizontal">
-              <WrapLayout class="description">
-              <Textview @textChange="change_description_button()" v-model="description" class="description-text" @focus="edit_description_text()" @blur="edit_description_text()" :backgroundColor="text_description_color" hint="Agregar Descripción" />
-              </WrapLayout>
-              </StackLayout>
-
-                <StackLayout orientation="horizontal" class="work">
-                  <AbsoluteLayout class="logo-list">
-                    <Image src="res://icon_checklist" stretch="aspectFill"/>
-                  </AbsoluteLayout>
-                    <label verticalAlignment="center" class="title-work" textWrap="true" text="Checklist" fontWeight="bold"/>
-                </StackLayout>
-
-                <StackLayout orientation="vertical" class="checklist">
-                  <StackLayout orientation="horizontal" v-for="task in checklist" class="task" >
-                    <AbsoluteLayout class="check">
-                      <Image @tap="task_finished(task._id, task.check,task.todo)" v-if="task.check=='check'" src="res://icon_yescheck" stretch="aspectFill"/>
-                      <Image @tap="task_finished(task._id, task.check,task.todo)" v-else src="res://icon_notcheck" stretch="aspectFill"/>
-                    </AbsoluteLayout>
-                    <Textview v-show="task.check=='check'" @blur="text_change($event)" style="text-Decoration:line-through;color:;" class="text-task" :text="task.todo"/>
-
-                    <Textview v-show="task.check==''" @focus="text_change($event)"  @textChange="text_change($event),edit_todo(task._id, task.check)" class="text-task" :text="task.todo"/>
-                  </StackLayout>
-                </StackLayout>
-                <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Nueva Subtarea" />
-            </StackLayout>
-          </ScrollView>
-    </Page>
+              <AbsoluteLayout @tap="delete_todo(task._id)" class="delete-container">>
+                <Image src="res://icon_eraser" stretch="" verticalAlignment="center" />
+              </AbsoluteLayout>
+          </StackLayout>
+        </StackLayout>
+        <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Nueva Subtarea" />
+      </StackLayout>
+    </ScrollView>
+  </Page>
 </template>
 
 <script>
@@ -286,24 +290,24 @@ width: 100%;
   margin-bottom: 5em;
 }
 .check{
-  width: 50em;
-  height: 50em;
+  width: 40em;
+  height: 40em;
 }
 .check image{
   width: 40em;
   margin-left: 5em;
 }
 .text-task{
-width: 60%;
+width: 85%;
 background-color: white;
+margin-left: 5em;
 }
-.button_list{
-  width: 50em;
-  height: 50em;
-}
-.button_list image{
+.delete-container{
+  height: 40em;
   width: 40em;
-  margin-left: 5em;
+}
+.delete-container image{
+  width: 40em;
 }
 .new-task{
   margin-bottom: 20em;
