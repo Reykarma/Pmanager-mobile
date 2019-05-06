@@ -13,7 +13,7 @@
       <GridLayout class="container-projects">
         <ScrollView>
           <StackLayout orientation="vertical">
-            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.project_id)" @tap="go_project(project.proyect_id,project.title)" class="card" >
+            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.project_id)" @tap="go_project(project.project_id,project.title)" class="card" >
               <StackLayout orientation="horizontal" class="control-card">
                 <label textWrap="true" class="project-name" :text="project.title"/>
                 <AbsoluteLayout v-show="project.buttons" class="button_edit">

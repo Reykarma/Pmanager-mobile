@@ -64,8 +64,8 @@ export default {
 				method:'GET'
 			}).then((response)=>{
 				var r = response.content.toJSON();
-        this.description=r.task[0].description
-        this.checklist=r.task[0].todo
+        this.description=r.things.details
+        this.checklist=r.resource.todo
 			});
 
   },

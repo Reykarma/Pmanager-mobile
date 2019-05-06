@@ -7,35 +7,36 @@
 				</AbsoluteLayout>
 					<label verticalAlignment="center" class="title-page" textWrap="false" :text="title" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
-						<Image @tap="check_network()" class="button-calendar"  src="res://icon_calendar" stretch="aspectFill" verticalAlignment="center" />
+						<Image @tap="check_network()" class="button-calendar"  src="res://icon_add_green" stretch="aspectFill" verticalAlignment="center" />
 					</AbsoluteLayout>
 			</WrapLayout>
 		</ActionBar>
-
+		<GridLayout class="container-page">
+		<GridLayout>
 		<ScrollView orientation="horizontal">
 			<FlexboxLayout class="container">
-				<StackLayout v-for="status in status" orientation="vertical" class="container-list">
+				<StackLayout v-for="list in lists" orientation="vertical" class="container-list">
 					<AbsoluteLayout class="Title-list">
-						<label verticalAlignment="center" textWrap="true" :text="status" fontWeight="bold"/>
-						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(status)">
+						<label verticalAlignment="center" textWrap="true" :text="list.td" fontWeight="bold"/>
+						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(list.td)">
 							<Image class="button_add" src="res://icon_add" stretch="aspectFill" verticalAlignment="center"/>
 						</AbsoluteLayout>
           </AbsoluteLayout>
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
-              <StackLayout orientation="vertical" class="list">
-                <WrapLayout v-if="list.status==status" @tap="checklist(list._id, list.work)" @longPress="showbutton(list._id)" v-for="list in tasks" class="cards" backgroundColor="white">
-				    			<label  class="title-cards" textWrap="true" :text="list.work"/>
+              <StackLayout v-if="task._thingstoid==list._id" v-for="task in tasks" orientation="vertical" class="list">
+                <WrapLayout  v-for="card in task.things" @tap="checklist(card._id, card.name)" @longPress="showbutton(card._id,list._id)" class="cards" backgroundColor="white">
+				    			<label  class="title-cards" textWrap="true" :text="card.name"/>
                   <label  class="progress-task" textWrap="true" text="8/10"/>
 									<WrapLayout class="content_components">
-										<AbsoluteLayout v-show="list.button" class="left_button">
-											<Image v-show="list.status!='Backlog'" src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'m',m:''})"/>
+										<AbsoluteLayout v-show="card.button" class="left_button">
+											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:card.status,_id:list._id, sai:'m',m:''})"/>
 										</AbsoluteLayout>
-										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete({_id:list._id, m:''})" v-show="list.button" class="Delete_button">
+										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete({_id:card._id, m:''})" v-show="card.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
-										<AbsoluteLayout v-show="list.button" class="right_button">
-											<Image  v-show="list.status!='Stop'" src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change({status:list.status,_id:list._id, sai:'n',m:''})" />
+										<AbsoluteLayout v-show="card.button" class="right_button">
+											<Image src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change({status:card.status,_id:card._id, sai:'n',m:''})" />
 										</AbsoluteLayout>
 	                </WrapLayout>
                 </WrapLayout>
@@ -44,6 +45,8 @@
           </StackLayout>
         </FlexboxLayout>
         </ScrollView>
+			</GridLayout>
+			</GridLayout>
     </Page>
 </template>
 
@@ -65,7 +68,7 @@ export default {
 props: ["user", "project","title"],
 data() {
 		return {
-				status: ["Backlog", "Progress", "Review", "Stop"],
+				lists: [],
 				tasks: [],
 				id:0,
 				adios:"",
@@ -112,10 +115,13 @@ data() {
 						method:'GET'
 					}).then((response)=>{
 						var r = response.content.toJSON();
-						for (var a in r.task){
-						r.task[a].button = false;
-					}
-						this.tasks = r.task;
+						this.lists=r.lists
+						for (var a in r.liststodo) {
+							for (var b in r.liststodo[a].things) {
+								r.liststodo[a].things[b].button=false
+							}
+						}
+						this.tasks=r.liststodo
 					});
 			},
 			update_title(data){
@@ -176,18 +182,20 @@ data() {
 						}
 					}
         },
-        showbutton(id) {
+        showbutton(card,list) {
             for (var a in this.tasks){
-                if(this.tasks[a]._id==id){
-                    if(!this.tasks[a].button){
-                        this.tasks[a].button=true;
-												break;
-                    }else{
-                        this.tasks[a].button=false;
-												break;
-                    }
-                }
-            }
+                if(this.tasks[a]._thingstoid==list){
+									for (var b in this.tasks[a].things) {
+										if(this.tasks[a].things[b]._id==card) {
+											if (!this.tasks[a].things[b].button){
+												this.tasks[a].things[b].button=true
+											}else{
+												this.tasks[a].things[b].button=false
+											}
+										}
+									}
+								}
+							}
         },
 				change(data){
 					if(data.m==""){
@@ -241,7 +249,10 @@ data() {
 }
 .button-calendar{
 	height: 40em;
-	margin-left: 65%;
+	margin-left: 60%;
+}
+.container-page{
+	height: 100%;
 }
 .container {
     width: auto;
@@ -327,5 +338,16 @@ data() {
 }
 .left_button{
 	margin-left: 2%;
+}
+.button-container{
+  height: 50em;
+  width: 50em;
+  horizontal-align:right;
+  vertical-align: bottom;
+  margin-right: 13em;
+  margin-bottom: 18em;
+}
+.buttons{
+  height: 100%;
 }
 </style>
