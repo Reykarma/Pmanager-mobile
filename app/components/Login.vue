@@ -36,7 +36,7 @@ export default {
       login(){
         if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
           if(this.password==this.password_prueba){
-          localStorage.setItem('ID_user', "123")
+          localStorage.setItem('ID_user', "momantai")
           localStorage.setItem('user',this.user.toLowerCase())
           this.$navigateTo(projects,{transition:{name:"slideleft",duration:300}});
         }else{

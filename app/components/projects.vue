@@ -17,7 +17,7 @@
               <StackLayout orientation="horizontal" class="control-card">
                 <label textWrap="true" class="project-name" :text="project.title"/>
                 <AbsoluteLayout v-show="project.buttons" class="button_edit">
-                  <Image @tap="new_edit_project('edit',project.title)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
+                  <Image @tap="new_edit_project('edit',project.title,project.project_id)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
                 </AbsoluteLayout>
                 <AbsoluteLayout v-show="project.buttons" class="button_delete">
                   <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
@@ -39,7 +39,7 @@
           </StackLayout>
           </ScrollView>
           </GridLayout>
-          <AbsoluteLayout @tap="new_edit_project('create','')" class="button-container">
+          <AbsoluteLayout @tap="new_edit_project('create','','')" class="button-container">
             <Image class="buttons" src="res://icon_new" stretch="aspectFill"/>
           </AbsoluteLayout>
       </GridLayout>
@@ -52,20 +52,16 @@ import Taskboard from './Taskboard'
 import Login from './Login'
 import ModalComponent from "./newproject"
 const httpModule = require("http");
-var direccion_data="https://pmanagerd.mybluemix.net/api/projects/"
+var querystring = require ("querystring");
+var direccion_data="http://10.220.36.28:5000/api/projects/"
+var direccion_update="http://10.220.36.28:5000/api/project/"
 export default {
     data () {
         return {
           ID_user:localStorage.getItem('ID_user'),
           user:localStorage.getItem('user'),
           prueba:"",
-          projects:[
-            {
-              _id:"12312",
-              project:"plam",
-              buttons:false,
-            }
-          ]
+          projects:[]
         };
     },
     created(){
@@ -101,15 +97,37 @@ export default {
         localStorage.clear();
         this.$navigateTo(Login,{transition:{name:"slideright",duration:300}})
       },
-      new_edit_project(action,title){
+      new_edit_project(action,title,id){
         this.$showModal(ModalComponent,{props:{action:action,title:title}}).then(
           data=>{
             if(data.action=="create" && data.Titulo!=""){
-              this.projects.push({
-                _id:"2365",
-                project:data.Titulo,
-                buttons:false
-              });
+              httpModule.request({
+    							url: direccion_data+this.ID_user,
+    							method: 'PUT',
+    							content: querystring.stringify({
+    								'title':data.Titulo
+    							})
+      					}).then((response)=>{
+                  var r=response.content.toJSON()
+                  r.buttons=false
+                  this.projects.push(r)
+                })
+            }else if(data.action=="edit" && data.Titulo!=""){
+              httpModule.request({
+    							url: direccion_update+this.ID_user+"/"+id,
+    							method: 'PUT',
+    							content: querystring.stringify({
+    								'type':"update",
+                    'title':data.Titulo,
+                    'description':""
+    							})
+      					}).then((response)=>{
+                  for(var a in this.projects) {
+                    if (this.projects[a].project_id===id) {
+                      this.projects[a].title=data.Titulo
+                    }
+                  }
+                })
             }
           })
       },
