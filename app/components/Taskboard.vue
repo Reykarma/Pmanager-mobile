@@ -18,16 +18,18 @@
 				<StackLayout v-for="list in lists" orientation="vertical" class="container-list">
 					<AbsoluteLayout class="Title-list">
 						<label verticalAlignment="center" textWrap="true" :text="list.td" fontWeight="bold"/>
-						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(list.td)">
+						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(list.td,list._id)">
 							<Image class="button_add" src="res://icon_add" stretch="aspectFill" verticalAlignment="center"/>
 						</AbsoluteLayout>
           </AbsoluteLayout>
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout v-if="task._thingstoid==list._id" v-for="task in tasks" orientation="vertical" class="list">
-                <WrapLayout  v-for="card in task.things" @tap="checklist(card._id, card.name)" @longPress="showbutton(card._id,list._id)" class="cards" backgroundColor="white">
-				    			<label  class="title-cards" textWrap="true" :text="card.name"/>
-                  <label  class="progress-task" textWrap="true" text="8/10"/>
+                <WrapLayout  v-for="card in task.things" @longPress="showbutton(card._id,list._id)" class="cards" backgroundColor="white">
+									<StackLayout @tap="checklist(card._id, card.name)" orientation="vertical">
+				    				<label  class="title-cards" textWrap="true" :text="card.name"/>
+                  	<label  class="progress-task" textWrap="true" text="8/10"/>
+									</StackLayout>
 									<WrapLayout class="content_components">
 										<AbsoluteLayout v-show="card.button" class="left_button">
 											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:card.status,_id:list._id, sai:'m',m:''})"/>
@@ -40,6 +42,7 @@
 										</AbsoluteLayout>
 	                </WrapLayout>
                 </WrapLayout>
+
               </StackLayout>
             </ScrollView>
           </StackLayout>
@@ -132,17 +135,16 @@ data() {
 					}
 				}
 			},
-        Nuevo(status) {
+        Nuevo(status,id) {
             this.$showModal(ModalComponent, { props: { status: status, id:this.id} }).then(
                 data => {
                     if (data.Titulo != "") {
 												httpModule.request({
-														url:  direccion_data+this.user+"/"+this.project+"/task",
+														url: direccion_data+this.user+"/"+this.project+"/task",
 														method: 'POST',
 														content: querystring.stringify({
-														'work': data.Titulo,
-														'status': data.status,
-														'm': data.m,
+														'name': data.Titulo,
+														'status':id,
 														'typeAction': data.typeAction,
 														'tags':"",
 														})
@@ -152,13 +154,15 @@ data() {
             );
         },
 				new_task(data){
-					if (data.work != "") {
-							this.tasks.push({
+					for (var a in this.tasks) {
+						if(this.tasks[a]._thingstoid==data.status){
+							this.tasks[a].things.push({
 							_id: data._id,
-							status: data.status,
-							work: data.work,
+							name: data.name,
+							details:"",
 							button: false,
 						});
+						}
 					}
 				},
         Delete(data) {

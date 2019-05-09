@@ -13,25 +13,43 @@
       <GridLayout class="container-projects">
         <ScrollView>
           <StackLayout orientation="vertical">
-            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.project_id)" @tap="go_project(project.project_id,project.title)" class="card" >
+            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.project_id)" class="card" >
+              <WrapLayout @tap="go_project(project.project_id,project.title)">
               <StackLayout orientation="horizontal" class="control-card">
                 <label textWrap="true" class="project-name" :text="project.title"/>
-                <AbsoluteLayout v-show="project.buttons" class="button_edit">
-                  <Image @tap="new_edit_project('edit',project.title,project.project_id)" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
-                </AbsoluteLayout>
-                <AbsoluteLayout v-show="project.buttons" class="button_delete">
-                  <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
-                </AbsoluteLayout>
               </StackLayout>
               <StackLayout orientation="horizontal" class="details-project">
-                <AbsoluteLayout class="icons-details">
-                  <Image class="buttons" src="res://icon_tasks" stretch="aspectFill"/>
-                </AbsoluteLayout>
-                <label verticalAlignment="center" text="0 tareas"/>
-                <AbsoluteLayout class="icons-details">
-                  <Image class="buttons" src="res://icon_members" stretch="aspectFill"/>
-                </AbsoluteLayout>
-                <label verticalAlignment="center" text="1 miembros"/>
+
+                <StackLayout class="container-icons-details" orientation="vertical">
+                  <StackLayout class="container-info" orientation="horizontal">
+                    <AbsoluteLayout>
+                      <Image class="buttons" src="res://icon_tasks" stretch="aspectFill"/>
+                    </AbsoluteLayout>
+                    <label verticalAlignment="center" text="0 tareas"/>
+                  </StackLayout>
+                </StackLayout>
+                <StackLayout class="container-icons-details" orientation="vertical">
+                  <StackLayout class="container-info" orientation="horizontal">
+                    <AbsoluteLayout>
+                      <Image class="buttons" src="res://icon_members" stretch="aspectFill"/>
+                    </AbsoluteLayout>
+                    <label verticalAlignment="center" text="1 miembros"/>
+                  </StackLayout>
+                </StackLayout>
+
+              </StackLayout>
+              </WrapLayout>
+              <StackLayout orientation="horizontal">
+                <StackLayout orientation="vertical" class="buttons-container">
+                  <AbsoluteLayout @tap="new_edit_project('edit',project.title,project.project_id)" v-show="project.buttons" class="button_edit">
+                    <Image @tap="" class="buttons" src="res://icon_edit" stretch="aspectFill"/>
+                  </AbsoluteLayout>
+                </StackLayout>
+                <StackLayout orientation="vertical" class="buttons-container">
+                  <AbsoluteLayout @tap="" v-show="project.buttons" class="button_delete">
+                    <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
+                  </AbsoluteLayout>
+                </StackLayout>
               </StackLayout>
             </StackLayout>
             <AbsoluteLayout class="separador">
@@ -53,8 +71,8 @@ import Login from './Login'
 import ModalComponent from "./newproject"
 const httpModule = require("http");
 var querystring = require ("querystring");
-var direccion_data="http://10.220.36.28:5000/api/projects/"
-var direccion_update="http://10.220.36.28:5000/api/project/"
+var direccion_data="https://pmanagerd.mybluemix.net/api/projects/"
+var direccion_update="https://pmanagerd.mybluemix.net/api/project/"
 export default {
     data () {
         return {
@@ -137,7 +155,7 @@ export default {
 
 <style scoped>
 .separador{
-  height: 40em;
+  height: 55em;
 }
 .page-title{
   width: 80%;
@@ -178,7 +196,7 @@ width: auto;
   horizontal-align:right;
 }
 .card{
-  height: 100em;
+  height: auto;
   margin: 18em 15em 0 15em;
   background-color: white;
   border-radius: 15px;
@@ -190,9 +208,14 @@ width: auto;
 .details-project{
   height: 40em;
   text-align: center;
+  margin-bottom: 10em;
+  width: 100%;
 }
-.icons-details{
-margin-left: 20em;
+.container-icons-details{
+  width: 50%;
+}
+.container-info{
+  width: 120em;
 }
 .project-name{
   font-weight: bold;
@@ -201,17 +224,21 @@ margin-left: 20em;
   margin-left: 25em;
   color: black;
   vertical-align: center;
-  width: 50%;
+  width: 100%;
 }
 .button_edit{
   height: 30em;
-  margin-left: 15em;
+  width: 30em;
 }
 .button_delete{
   height: 35em;
-  margin-left: 20em;
+  width: 35em;
 }
 .buttons{
   height: 100%;
+}
+.buttons-container{
+  width: 50%;
+  margin-bottom: 10em;
 }
 </style>
