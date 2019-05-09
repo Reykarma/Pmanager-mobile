@@ -4,7 +4,7 @@
     <StackLayout orientation="horizontal">
       <label textWrap="true" class="page-title" :text="'Proyectos ' + user"/>
     <AbsoluteLayout class="container-button-exit">
-      <Image @tap="logout()" class="button_exit" src="res://icon_exit" stretch="aspectFill"/>
+      <Image @tap="profile()" class="button_exit" src="res://icon_exit" stretch="aspectFill"/>
     </AbsoluteLayout>
     </StackLayout>
     </ActionBar>
@@ -68,6 +68,7 @@
 require( "nativescript-localstorage" );
 import Taskboard from './Taskboard'
 import Login from './Login'
+import Profile from './profile'
 import ModalComponent from "./newproject"
 const httpModule = require("http");
 var querystring = require ("querystring");
@@ -114,6 +115,9 @@ export default {
       logout(){
         localStorage.clear();
         this.$navigateTo(Login,{transition:{name:"slideright",duration:300}})
+      },
+      profile(){
+        this.$navigateTo(Profile,{transition:{name:"slideBottom",duration:300}})
       },
       new_edit_project(action,title,id){
         this.$showModal(ModalComponent,{props:{action:action,title:title}}).then(
