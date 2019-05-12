@@ -3,8 +3,8 @@
     <ActionBar color="white" backgroundColor="#4D7BC6">
     <StackLayout orientation="horizontal">
       <label textWrap="true" class="page-title" :text="'Proyectos ' + user"/>
-    <AbsoluteLayout class="container-button-exit">
-      <Image @tap="profile()" class="button_exit" src="res://icon_exit" stretch="aspectFill"/>
+    <AbsoluteLayout class="container-button-profile">
+      <Image @tap="profile()" class="button_profile" src="res://icon_profile" stretch="aspectFill"/>
     </AbsoluteLayout>
     </StackLayout>
     </ActionBar>
@@ -67,7 +67,6 @@
 <script>
 require( "nativescript-localstorage" );
 import Taskboard from './Taskboard'
-import Login from './Login'
 import Profile from './profile'
 import ModalComponent from "./newproject"
 const httpModule = require("http");
@@ -111,10 +110,6 @@ export default {
               }
             }
           }
-      },
-      logout(){
-        localStorage.clear();
-        this.$navigateTo(Login,{transition:{name:"slideright",duration:300}})
       },
       profile(){
         this.$navigateTo(Profile,{transition:{name:"slideBottom",duration:300}})
@@ -167,12 +162,12 @@ export default {
   font-size: 20em;
   font-weight: bold;
 }
-.container-button-exit{
-  height: 30em;
+.container-button-profile{
+  height: 40em;
   width: 20%;
   text-align: right;
 }
-.button_exit{
+.button_profile{
   height: 100%;
   vertical-align: center;
 }

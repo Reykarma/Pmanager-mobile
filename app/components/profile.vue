@@ -15,8 +15,14 @@
         </AbsoluteLayout>
         <StackLayout orientation="vertical" class="texts">
           <label class="Name" textWrap="true" text="Jose Armando Colmenares"/>
-          <StackLayout orientation="horizontal" class="information">
-
+          <StackLayout orientation="vertical" class="information">
+            <label class="section" text="Correo"/>
+            <label class="information-text" text="Armando567@hotmail.com"/>
+            <label class="section" text="Usuario"/>
+            <label class="information-text" text="Armando"/>
+          </StackLayout>
+          <StackLayout orientation="vertical" class="container-buttons">
+            <Button class="logout" text="Cerrar sesion" @tap="logout()"/>
           </StackLayout>
         </StackLayout>
       </StackLayout>
@@ -27,6 +33,7 @@
 <script>
 require( "nativescript-localstorage" );
 import projects from './projects'
+import Login from './Login'
 export default {
     data () {
         return {
@@ -34,7 +41,10 @@ export default {
         };
     },
     methods:{
-
+      logout(){
+        localStorage.clear();
+        this.$navigateTo(Login,{transition:{name:"slideright",duration:300}})
+      },
     }
 }
 </script>
@@ -56,20 +66,40 @@ export default {
     width: 140em;
     height: 140em;
     border-radius: 100%;
-    margin-top: 20em;
+    margin-top: 40em;
   }
   .Name{
     width: 100%;
     text-align: center;
-    margin-top: 12em;
+    margin-top: 30em;
     font-size: 25em;
     font-weight: bold;
   }
   .information{
     width: 85%;
-    height: 200em;
+    height: 140em;
     border-radius: 10em;
-    margin-top: 20em;
+    margin-top: 15em;
     background-color: #e6e7e7;
+  }
+  .section{
+    width: 100%;
+    text-align: center;
+    font-size: 18em;
+    margin-top: 10em;
+    font-weight: bold;
+  }
+  .information-text{
+    text-align:center;
+    width: 100%;
+    font-size: 15em;
+  }
+  .logout{
+    margin-top: 20em;
+    width: 90%;
+    font-size: 17em;
+    font-weight: bold;
+    background-color:#4D7BC6;
+    color: white;
   }
 </style>
