@@ -11,7 +11,7 @@
     <ScrollView>
       <StackLayout orientation="vertical" backgroundColor="white">
         <AbsoluteLayout class="container-image">
-
+          <Image class="image_profile" src="https://scontent.fgdl5-1.fna.fbcdn.net/v/t1.0-9/11665405_981994431834084_8496367474596986641_n.jpg?_nc_cat=100&_nc_ht=scontent.fgdl5-1.fna&oh=af7139a01ba264c76a16492fe6541ecf&oe=5D5E03F1" stretch=""/>
         </AbsoluteLayout>
         <StackLayout orientation="vertical" class="texts">
           <label class="Name" textWrap="true" text="Jose Armando Colmenares"/>
@@ -62,11 +62,16 @@ export default {
 	width:80%;
 }
   .container-image{
-    background-color: red;
     width: 140em;
     height: 140em;
     border-radius: 100%;
     margin-top: 40em;
+    background-color: red;
+  }
+  .image_profile{
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
   }
   .Name{
     width: 100%;
