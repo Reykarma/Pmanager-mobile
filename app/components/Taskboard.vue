@@ -7,7 +7,7 @@
 				</AbsoluteLayout>
 					<label verticalAlignment="center" class="title-page" textWrap="false" :text="title" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
-						<Image @tap="check_network()" class="button-calendar"  src="res://icon_add_green" stretch="aspectFill" verticalAlignment="center" />
+						<Image @tap="Nuevo(title,'','board')" class="button-calendar"  src="res://icon_add_green" stretch="aspectFill" verticalAlignment="center" />
 					</AbsoluteLayout>
 			</WrapLayout>
 		</ActionBar>
@@ -18,27 +18,27 @@
 				<StackLayout v-for="list in lists" orientation="vertical" class="container-list">
 					<AbsoluteLayout class="Title-list">
 						<label verticalAlignment="center" textWrap="true" :text="list.td" fontWeight="bold"/>
-						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(list.td,list._id)">
+						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(list.td,list._id,'task')">
 							<Image class="button_add" src="res://icon_add" stretch="aspectFill" verticalAlignment="center"/>
 						</AbsoluteLayout>
           </AbsoluteLayout>
 
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout v-if="task._thingstoid==list._id" v-for="task in tasks" orientation="vertical" class="list">
-                <WrapLayout  v-for="card in task.things" @longPress="showbutton(card._id,list._id)" class="cards" backgroundColor="white">
+                <WrapLayout  v-for="(card, index) in task.things" @longPress="showbutton(card._id,list._id)" class="cards" backgroundColor="white">
 									<StackLayout @tap="checklist(card._id, card.name)" orientation="vertical">
 				    				<label  class="title-cards" textWrap="true" :text="card.name"/>
                   	<label  class="progress-task" textWrap="true" text="8/10"/>
 									</StackLayout>
 									<WrapLayout class="content_components">
 										<AbsoluteLayout v-show="card.button" class="left_button">
-											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({status:card.status,_id:list._id, sai:'m',m:''})"/>
+											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({id:card._id,list:list._id,index:index, move:'left'})"/>
 										</AbsoluteLayout>
 										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete({_id:card._id, m:''})" v-show="card.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
 										<AbsoluteLayout v-show="card.button" class="right_button">
-											<Image src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change({status:card.status,_id:card._id, sai:'n',m:''})" />
+											<Image src="res://icon_right" stretch="aspectFill" verticalAlignment="center" @tap="change({id:card._id,list:list._id,index:index, move:'right'})" />
 										</AbsoluteLayout>
 	                </WrapLayout>
                 </WrapLayout>
@@ -80,12 +80,14 @@ data() {
 },
 	mounted(){
 	socketIO.on('message', (msj)=>{
-		if(msj.typeAction=='changeStatus'){
-			this.change(msj);
+		if(msj.typeAction=='movetolist'){
+			this.change_board(msj);
 		}else if(msj.typeAction=='deleteTask'){
 			this.Delete(msj);
 		}else if(msj.typeAction=='title'){
 			this.update_title(msj);
+		}else if(msj.typeAction=='newlist'){
+			this.new_board(msj);
 		}else{
 			this.new_task(msj);
 		}
@@ -135,21 +137,30 @@ data() {
 					}
 				}
 			},
-        Nuevo(status,id) {
-            this.$showModal(ModalComponent, { props: { status: status, id:this.id} }).then(
+        Nuevo(status,id,action) {
+            this.$showModal(ModalComponent, { props: { status:status, id:this.id, action:action} }).then(
                 data => {
-                    if (data.Titulo != "") {
+                    if (data.Titulo != "" && action=="task") {
 												httpModule.request({
 														url: direccion_data+this.user+"/"+this.project+"/task",
 														method: 'POST',
 														content: querystring.stringify({
 														'name': data.Titulo,
 														'status':id,
-														'typeAction': data.typeAction,
+														'typeAction': "create",
 														'tags':"",
 														})
 													});
-                    }
+                    }else if(data.Titulo != "" && action=="board"){
+											httpModule.request({
+													url: direccion_data+this.user+"/"+this.project+"/l",
+													method: 'POST',
+													content: querystring.stringify({
+													'name': data.Titulo,
+													'action': "newlist"
+													})
+												});
+										}
                 }
             );
         },
@@ -164,6 +175,16 @@ data() {
 						});
 						}
 					}
+				},
+				new_board(data){
+					this.lists.push({
+						_id: data._id,
+						td: data.td
+					});
+					this.tasks.push({
+						_thingstoid: data._id,
+						things:[]
+					})
 				},
         Delete(data) {
 					if(data.m==''){
@@ -202,7 +223,38 @@ data() {
 							}
         },
 				change(data){
-					if(data.m==""){
+					for(var a in this.lists){
+						if(data.list==this.lists[a]._id && data.move=="right"){
+							httpModule.request({
+									url: direccion_data+this.user+"/"+this.project+"/l",
+									method: 'POST',
+									content: querystring.stringify({
+										'element':data.id,
+										'init':this.lists[a]._id,
+										'final':this.lists[parseInt(a)+1]._id,
+										'index':data.index,
+										'futureIndex':"0",
+										'action':"movetolist"
+									})
+								});
+						}
+					else if(data.list==this.lists[a]._id && data.move=="left"){
+							httpModule.request({
+									url: direccion_data+this.user+"/"+this.project+"/l",
+									method: 'POST',
+									content: querystring.stringify({
+										'element':data.id,
+										'init':this.lists[a]._id,
+										'final':this.lists[parseInt(a)-1]._id,
+										'index':data.index,
+										'futureIndex':"0",
+										'action':"movetolist"
+									})
+								});
+								break;
+						}
+					}
+					/*if(data.m==""){
 					httpModule.request({
 							url:  direccion_data+this.user+"/"+this.project+"/task",
 							method: 'PUT',
@@ -222,7 +274,28 @@ data() {
 								break;
 							}
 						}
+					}*/
+				},
+				change_board(msj){
+					var tareas
+					for(var a in this.tasks){
+						if(this.tasks[a]._thingstoid==msj.init){
+							tareas=this.tasks[a].things[msj.index]
+							this.tasks[a].things.splice(msj.index,1)
+							break;
+						}
 					}
+					for(var b in this.tasks){
+						if (this.tasks[b]._thingstoid==msj.final) {
+							this.tasks[b].things.push({
+							_id: tareas._id,
+							name: tareas.name,
+							details:"",
+							button: false,
+						});
+						}
+					}
+				//	this.load_page()
 				},
 				checklist(id, work){
 					this.$navigateTo(checklist,{transition:{name:"slideleft",duration:400}, props: {user:this.user, project:this.project, id:id, work:work }});

@@ -14,12 +14,12 @@
 </template>
 <script>
 export default {
-    props: ["status", "id"],
+    props: ["status", "id","action"],
     data() {
         return {
             Titulo: "",
 						m: 'rm',
-						typeAction: 'create'
+						typeAction: action
         };
     },
     methods: {

@@ -11,7 +11,7 @@
     <ScrollView>
       <StackLayout orientation="vertical" backgroundColor="white">
         <AbsoluteLayout class="container-image">
-          <Image class="image_profile" src="https://scontent.fgdl5-1.fna.fbcdn.net/v/t1.0-9/11665405_981994431834084_8496367474596986641_n.jpg?_nc_cat=100&_nc_ht=scontent.fgdl5-1.fna&oh=af7139a01ba264c76a16492fe6541ecf&oe=5D5E03F1" stretch=""/>
+          <Image class="image_profile" src="https://pmanagerd.mybluemix.net/static/img/persona2.png" stretch="aspectFill"/>-
         </AbsoluteLayout>
         <StackLayout orientation="vertical" class="texts">
           <label class="Name" textWrap="true" text="Jose Armando Colmenares"/>
@@ -22,6 +22,7 @@
             <label class="information-text" text="Armando"/>
           </StackLayout>
           <StackLayout orientation="vertical" class="container-buttons">
+            <Button class="logout" text="Cambiar contraseña" @tap=""/>
             <Button class="logout" text="Cerrar sesion" @tap="logout()"/>
           </StackLayout>
         </StackLayout>
