@@ -43,6 +43,26 @@
           </StackLayout>
         </StackLayout>
         <TextField v-model="newtodo" @returnPress="new_todo()" class="new-task" hint="Nueva Subtarea" />
+
+        <StackLayout orientation="horizontal" class="work">
+          <AbsoluteLayout class="logo-list">
+            <Image src="res://icon_checklist" stretch="aspectFill"/>
+          </AbsoluteLayout>
+          <label verticalAlignment="center" class="title-work" textWrap="true" text="Comentarios" fontWeight="bold"/>
+        </StackLayout>
+        <StackLayout orientation="vertical" class="comments">
+          <StackLayout orientation="horizontal" v-for="task in checklist" class="list-comments" >
+              <StackLayout orientation="vertical">
+                <label text="Jose Armando Colmenares" class="user-comment"/>
+                <label textWrap="true" class="text-comment" text="Esto es un comentario para que los usuarios puedan dejar sus opiniones"/>
+                <label class="date" text="12/05/2009" />
+              </StackLayout>
+              <AbsoluteLayout @tap="delete_todo(task._id)" class="delete-container">
+                <Image src="res://icon_eraser" stretch="" verticalAlignment="center" />
+              </AbsoluteLayout>
+          </StackLayout>
+        </StackLayout>
+        <TextField v-model="newtodo" @returnPress="new_todo()" class="new-comment" hint="Agregar comentario" />
       </StackLayout>
     </ScrollView>
   </Page>
@@ -148,6 +168,7 @@ export default {
           }*/
         },
         change_title_button(){
+          console.log("change");
           httpModule.request({
 							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
 							method: 'PUT',
@@ -155,7 +176,7 @@ export default {
                 'newTitle':this.title,
                 'action':'title',
 							})
-  					});
+  					})
           //utils.ad.dismissSoftInput();
         },
         change_description_button(){
@@ -280,12 +301,12 @@ width: 100%;
   color:black;
 }
 
-.checklist{
+.checklist,.coments{
   width: 100%;
   border:1 0 1 0;
   border-color: black;
 }
-.task{
+.task,.list{
   margin-top: 5em;
   margin-bottom: 5em;
 }
@@ -293,14 +314,33 @@ width: 100%;
   width: 40em;
   height: 40em;
 }
+.list-comments{
+  margin-top: 20em;
+}
 .check image{
   width: 40em;
   margin-left: 5em;
 }
-.text-task{
+.user-comment{
+  margin-left: 15em;
+  font-weight: bold;
+  color: black;
+}
+.text-task,.text-comment{
 width: 85%;
 background-color: white;
 margin-left: 5em;
+}
+.text-comment{
+  margin-bottom: 5em;
+  margin-top: 5em;
+}
+.date{
+margin-left: 15em;
+}
+.text-comment{
+  margin-left: 15em;
+  color: black;
 }
 .delete-container{
   height: 40em;
@@ -309,13 +349,16 @@ margin-left: 5em;
 .delete-container image{
   width: 40em;
 }
-.new-task{
-  margin-bottom: 20em;
+.new-task,.new-comment{
+  margin-bottom: 25em;
   border-width: 0 0 2 0;
   border-bottom-color: white;
   border-radius: 25px;
   background-color: #f1f1f1;
   width: 95%;
+}
+.new-comment{
+  margin-top: 10em;
 }
 .text-prueba{
   margin-bottom: 10em;

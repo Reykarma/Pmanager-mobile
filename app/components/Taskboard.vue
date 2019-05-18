@@ -130,12 +130,21 @@ data() {
 					});
 			},
 			update_title(data){
+				this.tasks[0].things.push({
+				_id: 0,
+				name: "Prueba",
+				details:"",
+				button: false,
+			});
+				/*
 				for (var a in this.tasks) {
-					if (data._id==this.tasks[a]._id){
-							this.tasks[a].work=data.work
-							break;
+					for(var b in this.tasks[a].things){
+						if (data._id==this.tasks[a].things[b]._id){
+								this.tasks[a].things[b].name=data.name
+								break;
+						}
 					}
-				}
+				}*/
 			},
         Nuevo(status,id,action) {
             this.$showModal(ModalComponent, { props: { status:status, id:this.id, action:action} }).then(

@@ -223,7 +223,7 @@ width: auto;
   margin-left: 25em;
   color: black;
   vertical-align: center;
-  width: 100%;
+  width: 90%;
 }
 .button_edit{
   height: 30em;
