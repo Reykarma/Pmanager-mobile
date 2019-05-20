@@ -7,15 +7,19 @@
 				</AbsoluteLayout>
 					<label verticalAlignment="center" class="title-page" textWrap="false" :text="title" fontWeight="bold"/>
 					<AbsoluteLayout class="top-menu">
+						<Image @tap="collaborators()" class="button-calendar"  src="res://icon_collaborator" stretch="aspectFill" verticalAlignment="center" />
+					</AbsoluteLayout>
+					<AbsoluteLayout class="top-menu">
 						<Image @tap="Nuevo(title,'','board')" class="button-calendar"  src="res://icon_add_green" stretch="aspectFill" verticalAlignment="center" />
 					</AbsoluteLayout>
 			</WrapLayout>
 		</ActionBar>
 		<GridLayout class="container-page">
-		<GridLayout>
+		<GridLayout backgroundColor="#014185">
+			<ActivityIndicator class="animation" :busy="animation" @busyChange="onBusyChanged" />
 		<ScrollView orientation="horizontal">
-			<FlexboxLayout class="container">
-				<StackLayout v-for="list in lists" orientation="vertical" class="container-list">
+			<FlexboxLayout v-show="mostrar" class="container">
+				<StackLayout v-if="mostrar" v-for="list in lists" orientation="vertical" class="container-list">
 					<AbsoluteLayout class="Title-list">
 						<label verticalAlignment="center" textWrap="true" :text="list.td" fontWeight="bold"/>
 						<AbsoluteLayout class="add-card" text="+" fontWeight="bold" @tap="Nuevo(list.td,list._id,'task')">
@@ -34,7 +38,7 @@
 										<AbsoluteLayout v-show="card.button" class="left_button">
 											<Image src="res://icon_left" stretch="aspectFill" verticalAlignment="center" @tap="change({id:card._id,list:list._id,index:index, move:'left'})"/>
 										</AbsoluteLayout>
-										<AbsoluteLayout horizontalAlignment="center"  @tap="Delete({_id:card._id, m:''})" v-show="card.button" class="Delete_button">
+										<AbsoluteLayout horizontalAlignment="center" @tap="Delete(list._id,card._id)" v-show="card.button" class="Delete_button">
 											<Image src="res://icon_delete" stretch="aspectFill" verticalAlignment="center" />
 										</AbsoluteLayout>
 										<AbsoluteLayout v-show="card.button" class="right_button">
@@ -58,6 +62,7 @@ require( "nativescript-localstorage" );
 import ModalComponent from "./newtask";
 import checklist from "./checklist";
 import projects from './projects';
+import collaborators from './collaborators'
 var SocketIO = require('nativescript-socketio').SocketIO;
 var direccion_socket="https://pmanagerd.mybluemix.net/view"
 var direccion_data="https://pmanagerd.mybluemix.net/api/"
@@ -66,6 +71,7 @@ require( "nativescript-localstorage" );
 var socketIO = new SocketIO(direccion_socket);
 const httpModule = require("http");
 const connectivity = require("tns-core-modules/connectivity");
+const timerModule = require("tns-core-modules/timer");
 export default {
 
 props: ["user", "project","title"],
@@ -75,16 +81,18 @@ data() {
 				tasks: [],
 				id:0,
 				adios:"",
-				mostrar:false
+				mostrar:false,
+				animation:true
 		};
 },
 	mounted(){
+	this.show_lists()
 	socketIO.on('message', (msj)=>{
 		if(msj.typeAction=='movetolist'){
 			this.change_board(msj);
-		}else if(msj.typeAction=='deleteTask'){
+		}/*else if(msj.typeAction=='deleteTask'){
 			this.Delete(msj);
-		}else if(msj.typeAction=='title'){
+		}*/else if(msj.typeAction=='title'){
 			this.update_title(msj);
 		}else if(msj.typeAction=='newlist'){
 			this.new_board(msj);
@@ -128,6 +136,12 @@ data() {
 						}
 						this.tasks=r.liststodo
 					});
+			},
+			show_lists(){
+				setTimeout(() => {
+					this.mostrar=true
+					this.animation=false
+	     }, 650);
 			},
 			update_title(data){
 				this.tasks[0].things.push({
@@ -176,12 +190,13 @@ data() {
 				new_task(data){
 					for (var a in this.tasks) {
 						if(this.tasks[a]._thingstoid==data.status){
-							this.tasks[a].things.push({
+							this.tasks[a].things.unshift({
 							_id: data._id,
 							name: data.name,
 							details:"",
 							button: false,
 						});
+						break;
 						}
 					}
 				},
@@ -195,26 +210,25 @@ data() {
 						things:[]
 					})
 				},
-        Delete(data) {
-					if(data.m==''){
-					httpModule.request({
-							url:  direccion_data+this.user+"/"+this.project+"/task",
-							method: 'PUT',
-							content: querystring.stringify({
-								'_id':data._id,
-								'm': 'rm',
-								'typeAction':'deleteTask',
-								'action':'delete'
-							})
-						});
-					}else{
-						for (var a in this.tasks) {
-							if (data.id==this.tasks[a]._id){
-									this.tasks.splice(a,1);
-									break;
-							}
+        Delete(list,card) {
+					confirm({
+            title: "Confirmacion",
+            message: "Realmente desea eliminar la tarea?",
+            okButtonText: "Confirmar",
+            cancelButtonText: "Cancelar"
+          }).then(result => {
+						if(result){
+							httpModule.request({
+								url:  direccion_data+this.user+"/"+this.project+"/task",
+								method: 'PUT',
+								content: querystring.stringify({
+									'list':list,
+									'_id':card,
+									'typeAction':'deleteTask',
+								})
+							});
 						}
-					}
+					})
         },
         showbutton(card,list) {
             for (var a in this.tasks){
@@ -309,6 +323,10 @@ data() {
 				checklist(id, work){
 					this.$navigateTo(checklist,{transition:{name:"slideleft",duration:400}, props: {user:this.user, project:this.project, id:id, work:work }});
 				},
+				collaborators(){
+					this.$showModal(collaborators).then()
+
+				}
 	}
 }
 </script>
@@ -327,18 +345,23 @@ data() {
 }
 .title-page{
 	font-size: 20em;
-	width:50%;
+	width:55%;
 }
 .top-menu{
-	width:30%;
+	width:15%;
 	height:40em;
 }
 .button-calendar{
-	height: 40em;
-	margin-left: 60%;
+	height: 35em;
+	margin-left: 20%;
 }
 .container-page{
 	height: 100%;
+}
+.animation{
+	height: 100em;
+	width:100em;
+	color: WHITE;
 }
 .container {
     width: auto;
@@ -396,14 +419,17 @@ data() {
   width: 100%;
   height: auto;
   text-align: center;
-	font-weight: bold;
+	font-style: italic;
 	font-size: 17em;
+	color: black;
+	margin-top: 10em;
 }
 .progress-task{
   margin: 40px;
   text-align: left;
   width: 90%;
   color: #ee084d;
+	margin-bottom: 10em;
 }
 .Delete_button, .left_button, .right_button{
     width:12%;

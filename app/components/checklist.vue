@@ -9,8 +9,10 @@
       </WrapLayout>
     </ActionBar>
 
+    <GridLayout>
+      <ActivityIndicator class="animation" :busy="animation" @busyChange="" />
     <ScrollView orientation="vertical">
-      <StackLayout orientation="vertical" class="properties">
+      <StackLayout v-if="mostrar" orientation="vertical" class="properties">
         <StackLayout orientation="horizontal">
           <Textview @textChange="change_title_button()" verticalAlignment="center" class="title-task" v-model="title" fontWeight="bold"/>
         </StackLayout>
@@ -65,6 +67,7 @@
         <TextField v-model="newtodo" @returnPress="new_todo()" class="new-comment" hint="Agregar comentario" />
       </StackLayout>
     </ScrollView>
+    </GridLayout>
   </Page>
 </template>
 
@@ -74,7 +77,12 @@ import Taskboard from './Taskboard';
 const httpModule = require("http");
 var querystring = require ("querystring");
 var direccion_data="https://pmanagerd.mybluemix.net/api/"
+var SocketIO = require('nativescript-socketio').SocketIO;
+var direccion_socket="https://pmanagerd.mybluemix.net/view"
+var socketIO = new SocketIO(direccion_socket);
 var Toast = require("nativescript-toast");
+const connectivity = require("tns-core-modules/connectivity");
+const timerModule = require("tns-core-modules/timer");
 export default {
   props: ["user","project","id","work"],
 
@@ -98,11 +106,57 @@ export default {
           description:"",
           newtodo:"",
           text_task_ckeck:"",
-
           checklist:[],
+          mostrar:false,
+          animation:true,
         };
     },
+    mounted(){
+      this.show_checklist()
+      /*socketIO.on('message', (mssj)=>{
+        if(mssj.typeAction=='title'){
+          alert('Usuario Incorrecto')
+          .then(() => {
+            console.log("Alert dialog closed.");
+            });
+        }
+      })*/
+    },
       methods: {
+        check_network(){
+  				const connectionType = connectivity.getConnectionType();
+  				if(connectionType==connectivity.connectionType.none){
+  					alert({
+  		  			title: "Sin Conexion",
+  		  			message: "asegúrese de estar conectado a internet",
+  		  			okButtonText: "Reintentar"
+  						}).then(() => {
+  		  				this.check_network()
+  							return false
+  						});
+  				}else{
+  					this.load_page()
+  					return true
+  				}
+  			},
+        load_page(){
+          httpModule.request({
+              url: direccion_data+this.user,
+              method:'GET'
+            }).then((response)=>{
+              var projects = response.content.toJSON();
+              for (var a in projects){
+              projects[a].buttons = false;
+            }
+              this.projects = projects;
+            });
+        },
+        show_checklist(){
+  				setTimeout(() => {
+            this.mostrar=true
+            this.animation=false
+  	     }, 500);
+  			},
         text_change(args){
           this.text_task_ckeck=args.object["text"]
         },
@@ -184,7 +238,7 @@ export default {
 							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
 							method: 'PUT',
 							content: querystring.stringify({
-                'newDescription':this.description,
+                'newdetails':this.description,
                 'action':'description',
 							})
   					});
@@ -217,28 +271,37 @@ export default {
   					}).then((response)=>{
               var r=response.content.toJSON()
               r.edit=false
-              this.checklist.push(r)
+              this.checklist.unshift(r)
               this.newtodo=""
               Toast.makeText("Elemento agregado").show();
             })
         },
         delete_todo(id){
-          httpModule.request({
-							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
-							method: 'PUT',
-							content: querystring.stringify({
-								'action':'todo',
-                'actodo':'delete',
-                '_id':id,
-							})
-  					});
-            for (var a in this.checklist) {
-							if (id==this.checklist[a]._id){
-									this.checklist.splice(a,1);
-                  Toast.makeText("Elemento Eliminado").show();
-									break;
-							}
-						}
+          confirm({
+            title: "Confirmacion",
+            message: "Realmente desea eliminar la tarea?",
+            okButtonText: "Confirmar",
+            cancelButtonText: "Cancelar"
+          }).then(result => {
+            if (result) {
+              httpModule.request({
+    							url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+    							method: 'PUT',
+    							content: querystring.stringify({
+    								'action':'todo',
+                    'actodo':'delete',
+                    '_id':id,
+    							})
+      					});
+                for (var a in this.checklist) {
+    							if (id==this.checklist[a]._id){
+    									this.checklist.splice(a,1);
+                      Toast.makeText("Elemento Eliminado").show();
+    									break;
+    							}
+    						}
+            }
+          });
         }
       },
 }
@@ -257,6 +320,11 @@ export default {
 .title-page{
   width: 85%;
   font-size: 20em;
+}
+.animation{
+  width: 100em;
+  height: 100em;
+  color: #37a338;
 }
 .title-task{
 	font-size: 18em;

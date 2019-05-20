@@ -11,9 +11,10 @@
 
     <GridLayout class="container">
       <GridLayout class="container-projects">
+        <ActivityIndicator class="animation" :busy="animation" @busyChange="" />
         <ScrollView>
-          <StackLayout orientation="vertical">
-            <StackLayout orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.project_id)" class="card" >
+          <StackLayout v-show="mostrar" orientation="vertical">
+            <StackLayout v-if="mostrar" orientation="vertical" v-for="project in projects" @longPress="show_buttons(project.project_id)" class="card" >
               <WrapLayout @tap="go_project(project.project_id,project.title)">
               <StackLayout orientation="horizontal" class="control-card">
                 <label textWrap="true" class="project-name" :text="project.title"/>
@@ -46,7 +47,7 @@
                   </AbsoluteLayout>
                 </StackLayout>
                 <StackLayout orientation="vertical" class="buttons-container">
-                  <AbsoluteLayout @tap="" v-show="project.buttons" class="button_delete">
+                  <AbsoluteLayout @tap="delete_project(project.project_id)" v-show="project.buttons" class="button_delete">
                     <Image class="buttons" src="res://icon_trash" stretch="aspectFill"/>
                   </AbsoluteLayout>
                 </StackLayout>
@@ -73,28 +74,60 @@ const httpModule = require("http");
 var querystring = require ("querystring");
 var direccion_data="https://pmanagerd.mybluemix.net/api/projects/"
 var direccion_update="https://pmanagerd.mybluemix.net/api/project/"
+const connectivity = require("tns-core-modules/connectivity");
+const timerModule = require("tns-core-modules/timer");
 export default {
     data () {
         return {
           ID_user:localStorage.getItem('ID_user'),
           user:localStorage.getItem('user'),
           prueba:"",
-          projects:[]
+          projects:[],
+          mostrar:false,
+          animation:true
         };
     },
+    mounted(){
+      this.show_projects()
+    },
     created(){
-      httpModule.request({
-          url: direccion_data+this.user,
-          method:'GET'
-        }).then((response)=>{
-          var projects = response.content.toJSON();
-          for (var a in projects){
-          projects[a].buttons = false;
-        }
-          this.projects = projects;
-        });
+      this.check_network();
     },
     methods:{
+      check_network(){
+				const connectionType = connectivity.getConnectionType();
+				if(connectionType==connectivity.connectionType.none){
+					alert({
+		  			title: "Sin Conexion",
+		  			message: "asegúrese de estar conectado a internet",
+		  			okButtonText: "Reintentar"
+						}).then(() => {
+		  				this.check_network()
+							return false
+						});
+				}else{
+					this.load_page()
+					return true
+				}
+			},
+      load_page(){
+        httpModule.request({
+            url: direccion_data+this.user,
+            method:'GET'
+          }).then((response)=>{
+            var projects = response.content.toJSON();
+            for (var a in projects){
+            projects[a].buttons = false;
+          }
+            this.projects = projects;
+          });
+      },
+      show_projects(){
+				setTimeout(() => {
+          this.mostrar=true
+          this.animation=false
+	     }, 1300);
+			},
       go_project(project,title){
         this.$navigateTo(Taskboard,{transition:{name:"slideleft",duration:400}, props: { user:this.user,project:project,title:title}});
       },
@@ -127,7 +160,7 @@ export default {
       					}).then((response)=>{
                   var r=response.content.toJSON()
                   r.buttons=false
-                  this.projects.push(r)
+                  this.projects.unshift(r)
                 })
             }else if(data.action=="edit" && data.Titulo!=""){
               httpModule.request({
@@ -148,6 +181,34 @@ export default {
             }
           })
       },
+      delete_project(project){
+        confirm({
+          title: "Confirmacion",
+          message: "Realmente desea eliminar proyecto?",
+          okButtonText: "Confirmar",
+          cancelButtonText: "Cancelar"
+        }).then(result => {
+          if (result) {
+            httpModule.request({
+              url:  direccion_update+this.user+"/"+project,
+              method: 'PUT',
+              content: querystring.stringify({
+                'type':'deleteProject',
+                'sure':true
+              })
+            }).then((response)=>{
+              var r=response.content.toJSON()
+              for(var a in this.projects) {
+                if (this.projects[a].project_id==project && r.status) {
+                  	this.projects.splice(a,1);
+                    break;
+                }
+              }
+            })
+
+          }
+        });
+      }
     }
 }
 </script>
@@ -178,6 +239,11 @@ width: auto;
   vertical-align: top;
   height: 100%;
   margin-bottom: 200px;
+}
+.animation{
+  height: 100em;
+  width: 100em;
+  color: #37a338;
 }
 .button-container{
   height: 55em;
@@ -217,7 +283,6 @@ width: auto;
   width: 120em;
 }
 .project-name{
-  font-weight: bold;
   font-style: italic;
   font-size: 25em;
   margin-left: 25em;

@@ -22,7 +22,7 @@
             <label class="information-text" text="Armando"/>
           </StackLayout>
           <StackLayout orientation="vertical" class="container-buttons">
-            <Button class="logout" text="Cambiar contraseña" @tap=""/>
+            <Button class="logout" text="Cambiar contraseña" @tap="prueba()"/>
             <Button class="logout" text="Cerrar sesion" @tap="logout()"/>
           </StackLayout>
         </StackLayout>
