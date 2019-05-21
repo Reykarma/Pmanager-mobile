@@ -1,25 +1,26 @@
 <template>
 	<page class="principal">
-		<DockLayout class="Agregar">
-			<StackLayout dock="top" class="formulario">
-				<Label class="Title" :text="'Nueva tarjeta en '+ status" fontWeight="bold" />
-      <TextField  @returnPress="Agregar" v-model="Titulo" class="inputs" hint="Agregar Texto" />
+		<StackLayout orientation="vertical" class="Agregar">
+			<StackLayout class="formulario">
+				<Label class="Title" text="Agregar Colaborador" fontWeight="bold" />
+      <TextField  @returnPress="Agregar" v-model="Titulo" class="inputs" hint="Usuario o Correo" />
     </StackLayout>
-    <StackLayout orientation="horizontal" class="Buttons" dock="bottom">
-	     <Button fontWeight="bold"  color="crimson" text="Cancelar" @tap="$modal.close()" />
-       <Button fontWeight="bold" color="black" @tap="Agregar" text="Aceptar"/>
-    </StackLayout>
-	</DockLayout>
+			<StackLayout class="users">
+				<StackLayout orientation="horizontal" class="user">
+					<AbsoluteLayout class="container-image">
+						<Image class="image_profile" src="https://pmanagerd.mybluemix.net/static/img/persona2.png" stretch="aspectFill"/>
+					</AbsoluteLayout>
+					<label class="user-text" text="Jose Armando Colmenares"  />
+				</StackLayout>
+			</StackLayout>
+	</StackLayout>
 </page>
 </template>
 <script>
 export default {
-    props: ["status", "id","action"],
     data() {
         return {
-            Titulo: "",
-						m: 'rm',
-						typeAction: action
+
         };
     },
     methods: {
@@ -38,25 +39,14 @@ export default {
 <style scoped>
 .Agregar{
   width: 100%;
-  height:40%;
+	height: 300em;
 }
 .formulario{
   width: 100%;
-  height: 70%;
-}
-.Buttons{
-  height: 30%;
-  width: 100%;
-}
-.Buttons Button{
-  width: 50%;
-  border-radius: 20px;
-	font-size: 17px;
 }
 .Title{
-  margin-top: 70px;
+  margin-top: 10px;
   width: 95%;
-  height: 30%;
   text-align: left;
   font-size: 18px;
   border-radius:20px;
@@ -65,6 +55,31 @@ export default {
   border-width: 0 0 2 0;
   border-bottom-color: #33af14 ;
   background-color: white;
-  height: 40%;
+  height: 50em;
+	margin-top: 5em;
+	margin-bottom: 10em;
+}
+.user{
+	margin-bottom: 5em;
+	margin-top: 5em;
+	margin-left: 5em;
+	margin-right: 5em;
+}
+.container-image{
+	width: 30em;
+	height: 30em;
+	border-radius: 100%;
+}
+.image_profile{
+	width: 100%;
+	height: 100%;
+	border-radius: 100%;
+}
+.user-text{
+	margin-left: 10em;
+	text-align: center;
+	vertical-align: center;
+	font-size: 15em;
+	font-weight: bold;
 }
 </style>

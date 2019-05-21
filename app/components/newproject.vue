@@ -44,7 +44,7 @@ export default {
 <style scoped>
 .Agregar{
   width: 100%;
-  height:40%;
+  height:220em;
 }
 .formulario{
   width: 100%;
