@@ -87,15 +87,7 @@ export default {
   props: ["user","project","id","work"],
 
   created(){
-    httpModule.request({
-				url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
-				method:'GET'
-			}).then((response)=>{
-				var r = response.content.toJSON();
-        this.description=r.things.details
-        this.checklist=r.resource.todo
-			});
-
+    this.load_page()
   },
     data () {
         return {
@@ -112,7 +104,7 @@ export default {
         };
     },
     mounted(){
-      this.show_checklist()
+
       /*socketIO.on('message', (mssj)=>{
         if(mssj.typeAction=='title'){
           alert('Usuario Incorrecto')
@@ -141,15 +133,14 @@ export default {
   			},
         load_page(){
           httpModule.request({
-              url: direccion_data+this.user,
-              method:'GET'
-            }).then((response)=>{
-              var projects = response.content.toJSON();
-              for (var a in projects){
-              projects[a].buttons = false;
-            }
-              this.projects = projects;
-            });
+      				url: direccion_data+this.user+"/"+this.project+"/t/"+this.id,
+      				method:'GET'
+      			}).then((response)=>{
+      				var r = response.content.toJSON();
+              this.description=r.things.details
+              this.checklist=r.resource.todo
+              this.show_checklist()
+      			});
         },
         show_checklist(){
   				setTimeout(() => {

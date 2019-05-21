@@ -88,7 +88,7 @@ export default {
         };
     },
     mounted(){
-      this.show_projects()
+
     },
     created(){
       this.check_network();
@@ -120,13 +120,14 @@ export default {
             projects[a].buttons = false;
           }
             this.projects = projects;
+            this.show_projects()
           });
       },
       show_projects(){
 				setTimeout(() => {
           this.mostrar=true
           this.animation=false
-	     }, 1300);
+	     }, 600);
 			},
       go_project(project,title){
         this.$navigateTo(Taskboard,{transition:{name:"slideleft",duration:400}, props: { user:this.user,project:project,title:title}});
@@ -168,8 +169,7 @@ export default {
     							method: 'PUT',
     							content: querystring.stringify({
     								'type':"update",
-                    'title':data.Titulo,
-                    'description':""
+                    'title':data.Titulo
     							})
       					}).then((response)=>{
                   for(var a in this.projects) {

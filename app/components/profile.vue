@@ -11,7 +11,7 @@
     <ScrollView>
       <StackLayout orientation="vertical" backgroundColor="white">
         <AbsoluteLayout class="container-image">
-          <Image class="image_profile" src="https://pmanagerd.mybluemix.net/static/img/persona2.png" stretch="aspectFill"/>-
+          <Image class="image_profile" src="https://pmanagerd.mybluemix.net/static/img/persona2.png" stretch="aspectFill"/>
         </AbsoluteLayout>
         <StackLayout orientation="vertical" class="texts">
           <label class="Name" textWrap="true" text="Jose Armando Colmenares"/>

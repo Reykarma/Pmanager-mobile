@@ -86,7 +86,6 @@ data() {
 		};
 },
 	mounted(){
-	this.show_lists()
 	socketIO.on('message', (msj)=>{
 		if(msj.typeAction=='movetolist'){
 			this.change_board(msj);
@@ -135,6 +134,7 @@ data() {
 							}
 						}
 						this.tasks=r.liststodo
+						this.show_lists()
 					});
 			},
 			show_lists(){
@@ -315,6 +315,7 @@ data() {
 							name: tareas.name,
 							details:"",
 							button: false,
+
 						});
 						}
 					}
@@ -365,7 +366,6 @@ data() {
 }
 .container {
     width: auto;
-    background-Color:#014185;
 }
 .container-list{
   width: 320em;
