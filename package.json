@@ -1,11 +1,11 @@
 {
   "name": "pmanager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A native application built with NativeScript-Vue",
-  "author": "Stret-coders",
+  "author": "Street-coders",
   "license": "MIT",
   "nativescript": {
-    "id": "org.nativescript.application",
+    "id": "com.streetcode.bretter",
     "tns-ios": {
       "version": "4.2.0"
     },

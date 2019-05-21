@@ -1,11 +1,11 @@
 // Add your native dependencies here:
 
 android {
-  defaultConfig {  
+  defaultConfig {
     generatedDensities = []
-    applicationId = "org.nativescript.application"
+    applicationId = "com.streetcode.bretter"
   }
   aaptOptions {  
-    additionalParameters "--no-version-vectors"  
-  }  
-} 
+    additionalParameters "--no-version-vectors"
+  }
+}
