@@ -25,12 +25,22 @@ export default {
     },
     methods: {
         Agregar() {
-            this.$modal.close({
-                status: this.status,
-                Titulo: this.Titulo,
-								m:this.m,
-								typeAction:this.typeAction,
-            });
+					httpModule.request({
+							url: direccion_data+"/api/search-user/"+localStorage.getItem('user'),
+							method: 'POST',
+							content: querystring.stringify({
+							'commentary':this.newcomment,
+							'user':this.user
+							})
+						}).then((response)=>{
+							var r=response.content.toJSON()
+							this.comments.push({
+								usercomment:r.usercomment,
+								commentary:r.commentary,
+								_idcomment:r._idcomment
+							})
+						})
+						this.newcomment=''
         }
     }
 };

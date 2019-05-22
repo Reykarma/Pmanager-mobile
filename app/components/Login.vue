@@ -32,29 +32,33 @@ export default {
           user:"",
           password:"",
           user_prueba:"momantai",
-          password_prueba:"123456789",
-          session:[]
+          password_prueba:"123456789"
         };
     },
     methods:{
       login(){
-      /*  httpModule.request({
+       httpModule.request({
             url: direccion_data+'/api/user/signin',
             method: 'POST',
             content: querystring.stringify({
             'user':this.user,
-            'password':this.user
+            'password':this.password
             })
           }).then((response)=>{
             var r=response.content.toJSON()
-            this.session=r
-            alert(this.session)
-            .then(() => {
-              console.log("Alert dialog closed.");
-              });
-          })*/
+            if(r.status){
+              localStorage.setItem('ID_user',r._userid)
+              localStorage.setItem('user',r.user)
+              this.$navigateTo(projects,{transition:{name:"slideleft",duration:300}});
+            }else{
+              alert("Datos incorrectos")
+              .then(() => {
+                console.log("Alert dialog closed.");
+                });
+            }
+          })
 
-        if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
+      /*  if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
           if(this.password==this.password_prueba){
           localStorage.setItem('ID_user', "momantai")
           localStorage.setItem('user',this.user.toLowerCase())
@@ -70,7 +74,7 @@ export default {
           .then(() => {
             console.log("Alert dialog closed.");
             });
-        }
+        }*/
 
       },
     }

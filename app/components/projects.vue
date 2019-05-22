@@ -34,7 +34,7 @@
                     <AbsoluteLayout>
                       <Image class="buttons" src="res://icon_members" stretch="aspectFill"/>
                     </AbsoluteLayout>
-                    <label verticalAlignment="center" text="1 miembros"/>
+                    <label verticalAlignment="center" :text= " project.members+' miembros'"/>
                   </StackLayout>
                 </StackLayout>
 
@@ -118,6 +118,8 @@ export default {
             var projects = response.content.toJSON();
             for (var a in projects){
             projects[a].buttons = false;
+            var count= projects[a].team
+            projects[a].members=Object.keys(count).length
           }
             this.projects = projects;
             this.show_projects()

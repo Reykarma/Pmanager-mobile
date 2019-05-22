@@ -53,18 +53,18 @@
           <label verticalAlignment="center" class="title-work" textWrap="true" text="Comentarios" fontWeight="bold"/>
         </StackLayout>
         <StackLayout orientation="vertical" class="comments">
-          <StackLayout orientation="horizontal" v-for="task in checklist" class="list-comments" >
+          <StackLayout orientation="horizontal" v-for="data in comments" class="list-comments" >
               <StackLayout orientation="vertical">
-                <label text="Jose Armando Colmenares" class="user-comment"/>
-                <label textWrap="true" class="text-comment" text="Esto es un comentario para que los usuarios puedan dejar sus opiniones"/>
-                <label class="date" text="12/05/2009" />
+                <label :text="data.usercomment" class="user-comment"/>
+                <label textWrap="true" class="text-comment" :text="data.commentary"/>
+                <!--<label class="date" text="12/05/2009" />-->
               </StackLayout>
               <AbsoluteLayout @tap="delete_todo(task._id)" class="delete-container">
                 <Image src="res://icon_eraser" stretch="" verticalAlignment="center" />
               </AbsoluteLayout>
           </StackLayout>
         </StackLayout>
-        <TextField v-model="newtodo" @returnPress="new_todo()" class="new-comment" hint="Agregar comentario" />
+        <TextField v-model="newcomment" @returnPress="new_comment()" class="new-comment" hint="Agregar comentario" />
       </StackLayout>
     </ScrollView>
     </GridLayout>
@@ -94,8 +94,10 @@ export default {
           title:this.work,
           description:"",
           newtodo:"",
+          newcomment:"",
           text_task_ckeck:"",
           checklist:[],
+          comments:[],
           mostrar:false,
           animation:true,
         };
@@ -127,6 +129,14 @@ export default {
               this.checklist=r.resource.todo
               this.show_checklist()
       			});
+
+            httpModule.request({
+                url: direccion_data+this.user+"/"+this.project+"/t/"+this.id+"/c",
+                method:'GET'
+              }).then((response)=>{
+                var r = response.content.toJSON();
+                this.comments=r
+              });
         },
         show_checklist(){
   				setTimeout(() => {
@@ -280,6 +290,24 @@ export default {
     						}
             }
           });
+        },
+        new_comment(){
+          httpModule.request({
+              url: direccion_data+this.user+"/"+this.project+"/t/"+this.id+"/c",
+              method: 'POST',
+              content: querystring.stringify({
+              'commentary':this.newcomment,
+              'user':this.user
+              })
+            }).then((response)=>{
+              var r=response.content.toJSON()
+              this.comments.push({
+                usercomment:r.usercomment,
+                commentary:r.commentary,
+                _idcomment:r._idcomment
+              })
+            })
+            this.newcomment=''
         }
       },
 }
