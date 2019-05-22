@@ -32,12 +32,13 @@ export default {
           user:"",
           password:"",
           user_prueba:"momantai",
-          password_prueba:"123456789"
+          password_prueba:"123456789",
+          session:[]
         };
     },
     methods:{
       login(){
-        httpModule.request({
+      /*  httpModule.request({
             url: direccion_data+'/api/user/signin',
             method: 'POST',
             content: querystring.stringify({
@@ -46,12 +47,13 @@ export default {
             })
           }).then((response)=>{
             var r=response.content.toJSON()
-            alert(r)
+            this.session=r
+            alert(this.session)
             .then(() => {
               console.log("Alert dialog closed.");
               });
-          })
-        /*
+          })*/
+
         if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
           if(this.password==this.password_prueba){
           localStorage.setItem('ID_user', "momantai")
@@ -69,7 +71,7 @@ export default {
             console.log("Alert dialog closed.");
             });
         }
-        */
+
       },
     }
 }

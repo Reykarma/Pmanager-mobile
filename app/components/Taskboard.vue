@@ -88,10 +88,10 @@ data() {
 	mounted(){
 	socketIO.on('message', (msj)=>{
 		if(msj.typeAction=='movetolist'){
-			this.change_board(msj);
-		}/*else if(msj.typeAction=='deleteTask'){
-			this.Delete(msj);
-		}*/else if(msj.typeAction=='title'){
+			this.load_page()
+		}else if(msj.typeAction=='deleteTask'){
+			this.delete_task(msj);
+		}else if(msj.typeAction=='title'){
 			this.update_title(msj);
 		}else if(msj.typeAction=='newlist'){
 			this.new_board(msj);
@@ -230,6 +230,23 @@ data() {
 						}
 					})
         },
+				delete_task(msj){
+					var bandera = false
+					for(var a in this.tasks){
+						if(this.tasks[a]._thingstoid==msj.list){
+							for (var b in this.tasks[a].things) {
+								if (this.tasks[a].things[b]._id==msj._id) {
+									this.tasks[a].things.splice(b,1)
+									bandera=true
+									break;
+								}
+							}
+						}
+						if (bandera) {
+							break;
+						}
+					}
+				},
         showbutton(card,list) {
             for (var a in this.tasks){
                 if(this.tasks[a]._thingstoid==list){
@@ -299,28 +316,33 @@ data() {
 						}
 					}*/
 				},
-				change_board(msj){
+			/*	change_board(msj){
 					var tareas
+
+					for(var b in this.tasks){
+						if (this.tasks[b]._thingstoid==msj.final) {
+							alert(msj.index)
+		          .then(() => {
+		            console.log("Alert dialog closed.");
+		            });
+
+							/*this.tasks[b].things.push({
+							_id: 1,
+							name: ,
+							details:"",
+							button: false,
+						});
+						}
+					}
 					for(var a in this.tasks){
 						if(this.tasks[a]._thingstoid==msj.init){
-							tareas=this.tasks[a].things[msj.index]
 							this.tasks[a].things.splice(msj.index,1)
 							break;
 						}
 					}
-					for(var b in this.tasks){
-						if (this.tasks[b]._thingstoid==msj.final) {
-							this.tasks[b].things.push({
-							_id: tareas._id,
-							name: tareas.name,
-							details:"",
-							button: false,
 
-						});
-						}
-					}
 				//	this.load_page()
-				},
+			},*/
 				checklist(id, tabla, work){
 					this.$navigateTo(checklist,{transition:{name:"slideleft",duration:400}, props: {user:this.user, project:this.project, id:id, tabla, work:work }});
 				},
