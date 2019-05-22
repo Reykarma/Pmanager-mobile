@@ -77,14 +77,11 @@ import Taskboard from './Taskboard';
 const httpModule = require("http");
 var querystring = require ("querystring");
 var direccion_data="https://pmanagerd.mybluemix.net/api/"
-var SocketIO = require('nativescript-socketio').SocketIO;
-var direccion_socket="https://pmanagerd.mybluemix.net/view"
-var socketIO = new SocketIO(direccion_socket);
 var Toast = require("nativescript-toast");
 const connectivity = require("tns-core-modules/connectivity");
 const timerModule = require("tns-core-modules/timer");
 export default {
-  props: ["user","project","id","work"],
+  props: ["user","project","id","work","tabla"],
 
   created(){
     this.load_page()
@@ -102,17 +99,6 @@ export default {
           mostrar:false,
           animation:true,
         };
-    },
-    mounted(){
-
-      /*socketIO.on('message', (mssj)=>{
-        if(mssj.typeAction=='title'){
-          alert('Usuario Incorrecto')
-          .then(() => {
-            console.log("Alert dialog closed.");
-            });
-        }
-      })*/
     },
       methods: {
         check_network(){
@@ -220,6 +206,7 @@ export default {
 							content: querystring.stringify({
                 'newTitle':this.title,
                 'action':'title',
+                'sta':this.tabla
 							})
   					})
           //utils.ad.dismissSoftInput();

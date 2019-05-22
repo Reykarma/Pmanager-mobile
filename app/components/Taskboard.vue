@@ -30,7 +30,7 @@
             <ScrollView scrollBarIndicatorVisible="false" class="vertical" orientation="vertical">
               <StackLayout v-if="task._thingstoid==list._id" v-for="task in tasks" orientation="vertical" class="list">
                 <WrapLayout  v-for="(card, index) in task.things" @longPress="showbutton(card._id,list._id)" class="cards" backgroundColor="white">
-									<StackLayout @tap="checklist(card._id, card.name)" orientation="vertical">
+									<StackLayout @tap="checklist(card._id, task._thingstoid , card.name)" orientation="vertical">
 				    				<label  class="title-cards" textWrap="true" :text="card.name"/>
                   	<label  class="progress-task" textWrap="true" text="8/10"/>
 									</StackLayout>
@@ -95,7 +95,7 @@ data() {
 			this.update_title(msj);
 		}else if(msj.typeAction=='newlist'){
 			this.new_board(msj);
-		}else{
+		}else if(msj.typeAction=='create'){
 			this.new_task(msj);
 		}
 	})
@@ -144,21 +144,21 @@ data() {
 	     }, 650);
 			},
 			update_title(data){
-				this.tasks[0].things.push({
-				_id: 0,
-				name: "Prueba",
-				details:"",
-				button: false,
-			});
-				/*
-				for (var a in this.tasks) {
+				var bolean=false
+			for(var a in this.tasks){
+				if(data.sta==this.tasks[a]._thingstoid){
 					for(var b in this.tasks[a].things){
-						if (data._id==this.tasks[a].things[b]._id){
-								this.tasks[a].things[b].name=data.name
-								break;
+						if(this.tasks[a].things[b]._id==data._id){
+							this.tasks[a].things[b].name=data.name
+							bolean=true
+							break;
 						}
 					}
-				}*/
+				}
+				if(bolean){
+					break;
+				}
+			}
 			},
         Nuevo(status,id,action) {
             this.$showModal(ModalComponent, { props: { status:status, id:this.id, action:action} }).then(
@@ -321,8 +321,8 @@ data() {
 					}
 				//	this.load_page()
 				},
-				checklist(id, work){
-					this.$navigateTo(checklist,{transition:{name:"slideleft",duration:400}, props: {user:this.user, project:this.project, id:id, work:work }});
+				checklist(id, tabla, work){
+					this.$navigateTo(checklist,{transition:{name:"slideleft",duration:400}, props: {user:this.user, project:this.project, id:id, tabla, work:work }});
 				},
 				collaborators(){
 					this.$showModal(collaborators).then()

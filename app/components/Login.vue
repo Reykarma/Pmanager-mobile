@@ -23,6 +23,9 @@
 <script>
 require( "nativescript-localstorage" );
 import projects from './projects'
+var direccion_data="https://pmanagerd.mybluemix.net"
+var querystring = require ("querystring");
+const httpModule = require("http");
 export default {
     data () {
         return {
@@ -34,6 +37,21 @@ export default {
     },
     methods:{
       login(){
+        httpModule.request({
+            url: direccion_data+'/api/user/signin',
+            method: 'POST',
+            content: querystring.stringify({
+            'user':this.user,
+            'password':this.user
+            })
+          }).then((response)=>{
+            var r=response.content.toJSON()
+            alert(r)
+            .then(() => {
+              console.log("Alert dialog closed.");
+              });
+          })
+        /*
         if(this.user.toLowerCase()==this.user_prueba.toLowerCase()){
           if(this.password==this.password_prueba){
           localStorage.setItem('ID_user', "momantai")
@@ -51,7 +69,7 @@ export default {
             console.log("Alert dialog closed.");
             });
         }
-
+        */
       },
     }
 }
